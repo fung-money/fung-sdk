@@ -1,0 +1,29 @@
+{
+  "name": "fung-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "lint": "lerna run lint",
+    "pre-commit": "lerna run pre-commit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fung-money/fung-sdk.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fung-money/fung-sdk/issues"
+  },
+  "homepage": "https://github.com/fung-money/fung-sdk#readme",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lerna": "^6.5.1"
+  }
+}
