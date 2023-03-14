@@ -1,3 +1,4 @@
+import assert from 'assert';
 import {
   CHECKOUT_ENDPOINT_PROD,
   CHECKOUT_ENDPOINT_SBX,
@@ -21,6 +22,9 @@ export default class Checkout extends EventTarget {
     sandbox?: boolean
   }) {
     super();
+
+    assert(checkoutId, 'checkoutId is required');
+    assert(containerId, 'containerId is required');
 
     this.checkoutId = checkoutId;
     this.containerId = containerId;
