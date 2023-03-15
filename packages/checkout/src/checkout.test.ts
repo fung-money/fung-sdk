@@ -71,21 +71,22 @@ describe('@fung-sdk/checkout', () => {
     expect(iframe?.src).toContain('https://sbx.fung.money');
   });
 
-  it('should dispatch a CHECKOUT_LOADED event', () => {
+  it('should dispatch a CHECKOUT_LOADED event', async () => {
     const checkout = new Checkout({
       checkoutId: 'abc',
       containerId: 'xyz',
     });
     const mockFn = jest.fn();
-    checkout.addEventListener('CHECKOUT_LOADED', mockFn);
+    checkout.addEventListener('checkout:loaded', mockFn);
     checkout.render();
 
     const iframe = document.querySelector('iframe');
+    iframe?.contentWindow?.parent.postMessage('checkout:loaded', '*');
+
+    // a small delay to allow the event to be dispatched
+    await new Promise((resolve) => { setTimeout(resolve, 10); });
+
     expect(iframe).not.toBeNull();
-
-    const event = new window.Event('load');
-    iframe?.dispatchEvent(event);
-
     expect(mockFn).toHaveBeenCalled();
   });
 });

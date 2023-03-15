@@ -1,9 +1,5 @@
 import assert from 'assert';
-import {
-  CHECKOUT_ENDPOINT_PROD,
-  CHECKOUT_ENDPOINT_SBX,
-  CHECKOUT_LOADED_EVENT,
-} from './config.js';
+import { CHECKOUT_ENDPOINT_PROD, CHECKOUT_ENDPOINT_SBX, CHECKOUT_EVENTS } from './config.js';
 
 export default class Checkout extends EventTarget {
   protected checkoutId: string;
@@ -43,10 +39,15 @@ export default class Checkout extends EventTarget {
     iframe.style.height = '100%';
     iframe.style.border = 'none';
 
-    iframe.addEventListener('load', () => {
-      this.dispatchEvent(new Event(CHECKOUT_LOADED_EVENT));
-    });
     return iframe;
+  }
+
+  private attactEventListeners(): void {
+    window.addEventListener('message', (event) => {
+      if (CHECKOUT_EVENTS.includes(event.data)) {
+        this.dispatchEvent(new Event(event.data));
+      }
+    });
   }
 
   render(): void {
@@ -58,5 +59,6 @@ export default class Checkout extends EventTarget {
     }
 
     container.appendChild(iframe);
+    this.attactEventListeners();
   }
 }
