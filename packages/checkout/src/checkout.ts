@@ -29,7 +29,7 @@ export default class Checkout extends EventTarget {
 
   private getCheckoutUrl() {
     const baseUrl = this.sandbox ? CHECKOUT_ENDPOINT_SBX : CHECKOUT_ENDPOINT_PROD;
-    return `${baseUrl}/checkout/${this.checkoutId}/view?iframe=true`;
+    return `${baseUrl}/checkout/${this.checkoutId}/view?authMode=CODE`;
   }
 
   private createIframe(): HTMLIFrameElement {
