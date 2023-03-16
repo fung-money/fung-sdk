@@ -58,6 +58,7 @@ export default class Checkout extends EventTarget {
       throw new Error(`No container with id "${this.containerId}" found`);
     }
 
+    container.innerHTML = '';
     container.appendChild(iframe);
     this.attactEventListeners();
   }
