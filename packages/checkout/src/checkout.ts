@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { CHECKOUT_ENDPOINT_PROD, CHECKOUT_ENDPOINT_SBX, CHECKOUT_EVENTS } from './config.js';
+import { CHECKOUT_ENDPOINT_PROD, CHECKOUT_ENDPOINT_SBX, CheckoutEvent } from './config.js';
 
 export default class Checkout extends EventTarget {
   protected checkoutId: string;
@@ -44,10 +44,14 @@ export default class Checkout extends EventTarget {
 
   private attactEventListeners(): void {
     window.addEventListener('message', (event) => {
-      if (CHECKOUT_EVENTS.includes(event.data)) {
+      if (Object.values(CheckoutEvent).includes(event.data)) {
         this.dispatchEvent(new Event(event.data));
       }
     });
+  }
+
+  on(event: CheckoutEvent, callback: () => void): void {
+    this.addEventListener(event, callback);
   }
 
   render(): void {
