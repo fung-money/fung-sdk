@@ -19,7 +19,7 @@
   "files": ["./index.ts"],
   "include": [
     "./src/**/*",
-    ".eslintrc.cjs",
-    "jest.config.js",
+    ".eslintrc.js",
+    "jest.config.mjs",
   ],
 }
