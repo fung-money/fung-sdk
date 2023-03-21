@@ -7,8 +7,7 @@
     "build": "lerna run build",
     "test": "lerna run test",
     "lint": "lerna run lint",
-    "pre-commit": "lerna run pre-commit",
-    "publish": "lerna publish"
+    "pre-commit": "lerna run pre-commit"
   },
   "repository": {
     "type": "git",

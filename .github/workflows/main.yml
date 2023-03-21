@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  checks:
+  main:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -35,6 +35,3 @@ jobs:
         run: npm run test
       - name: Build
         run: npm run build
-      - name: Publish
-        run: npm run publish
-      
