@@ -1,6 +1,5 @@
 name: Publish
 
-// run this workflow when a new tag is pushed
 on:
   push:
     tags:
