@@ -1,4 +1,4 @@
-name: Code quality checks
+name: Main
 
 on:
   push:
@@ -35,3 +35,6 @@ jobs:
         run: npm run test
       - name: Build
         run: npm run build
+      - name: Publish
+        run: npm run publish
+      
