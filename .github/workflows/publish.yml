@@ -34,5 +34,7 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: 'https://registry.npmjs.org'
+      - name: Check if able to publish changes
+        run: npm whoami
       - name: Publish
         run: npx lerna publish from-package -y
