@@ -7,13 +7,16 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         with:
           node-version: 16.x
+          registry-url: 'https://registry.npmjs.org'
+      - name: NPM identity
+        run: npm whoami
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -29,12 +32,5 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Setup .npmrc file for publish
-        uses: actions/setup-node@v2
-        with:
-          node-version: '12.x'
-          registry-url: 'https://registry.npmjs.org'
-      - name: Check if able to publish changes
-        run: npm whoami
       - name: Publish
         run: npx lerna publish from-package -y
