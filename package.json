@@ -10,9 +10,6 @@
     "pre-commit": "lerna run pre-commit",
     "version-bump": "lerna version"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fung-money/fung-sdk.git"

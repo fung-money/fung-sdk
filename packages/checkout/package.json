@@ -30,6 +30,9 @@
   "files": [
     "dist/**/*"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fung-money/fung-sdk.git",
@@ -55,5 +58,6 @@
     "jsdom": "^21.1.1",
     "ts-jest": "^29.0.5",
     "typescript": "^4.9.5"
-  }
+  },
+  "gitHead": "abd4080b283dc899d3bf966f0b5a6a2020452a32"
 }
