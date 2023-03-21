@@ -2,6 +2,7 @@
 import jest from 'jest-mock';
 import { JSDOM } from 'jsdom';
 import Checkout from './checkout.js';
+import { CheckoutEvent } from './config.js';
 
 describe('@fung-sdk/checkout', () => {
   beforeEach(() => {
@@ -77,7 +78,7 @@ describe('@fung-sdk/checkout', () => {
       containerId: 'xyz',
     });
     const mockFn = jest.fn();
-    checkout.addEventListener('checkout:loaded', mockFn);
+    checkout.on(CheckoutEvent.Loaded, mockFn);
     checkout.render();
 
     const iframe = document.querySelector('iframe');
