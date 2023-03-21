@@ -2,7 +2,6 @@
   "name": "@fung-sdk/checkout",
   "version": "1.0.7-alpha.0",
   "description": "",
-  "type": "module",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/index.js",
   "scripts": {
