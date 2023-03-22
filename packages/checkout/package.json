@@ -9,7 +9,7 @@
     "lint": "eslint . --ext .ts",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
-    "build:esm": "tsc -p ./tsconfig.esm.json && mv ./dist/esm/index.js ./dist/esm/index.mjs",
+    "build:esm": "tsc -p ./tsconfig.esm.json && echo '{ \"type\": \"module\" }' > ./dist/esm/package.json",
     "build:cjs": "tsc -p ./tsconfig.json",
     "prepack": "npm run build",
     "pre-commit": "npm run lint && npm run test && npm run build"
