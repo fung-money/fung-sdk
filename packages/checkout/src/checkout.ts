@@ -1,7 +1,8 @@
 import assert from 'assert';
+import EventEmitter2 from 'eventemitter2';
 import { CHECKOUT_ENDPOINT_PROD, CHECKOUT_ENDPOINT_SBX, CheckoutEvent } from './config.js';
 
-export default class Checkout extends EventTarget {
+export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
 
   protected containerId: string;
@@ -45,13 +46,9 @@ export default class Checkout extends EventTarget {
   private attactEventListeners(): void {
     window.addEventListener('message', (event) => {
       if (Object.values(CheckoutEvent).includes(event.data)) {
-        this.dispatchEvent(new Event(event.data));
+        this.emit(event.data);
       }
     });
-  }
-
-  on(event: CheckoutEvent, callback: () => void): void {
-    this.addEventListener(event, callback);
   }
 
   render(): void {
