@@ -47,7 +47,7 @@ export default class Checkout extends EventEmitter2 {
         baseUrl = CHECKOUT_ENDPOINT_DEV;
         break;
       default:
-        throw new Error(`Invalid env "${this.env}"`);
+      // No default, as we assign default in the constructor
     }
 
     return `${baseUrl}/v2/checkout/${this.checkoutId}/view`;
