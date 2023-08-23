@@ -47,10 +47,23 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.src).toContain("abc");
   });
 
-  it("should render a checkout iframe for prod", () => {
+  it("should render a checkout iframe with default env (prod)", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("https://app.fung.money");
+  });
+
+  it("should render a checkout iframe with env prod", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      env: "production",
     });
     checkout.render();
 
