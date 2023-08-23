@@ -1,13 +1,13 @@
-import assert from 'assert';
-import EventEmitter2 from 'eventemitter2';
+import assert from "assert";
+import EventEmitter2 from "eventemitter2";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_PROD,
   CHECKOUT_ENDPOINT_SBX,
   CheckoutEvent,
-} from './config.js';
+} from "./config.js";
 
-type Env = 'production' | 'sandbox' | 'development';
+type Env = "production" | "sandbox" | "development";
 export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
 
@@ -18,16 +18,16 @@ export default class Checkout extends EventEmitter2 {
   constructor({
     checkoutId,
     containerId,
-    env = 'production',
+    env = "production",
   }: {
     checkoutId: string;
     containerId: string;
-    env: Env;
+    env?: Env;
   }) {
     super();
 
-    assert(checkoutId, 'checkoutId is required');
-    assert(containerId, 'containerId is required');
+    assert(checkoutId, "checkoutId is required");
+    assert(containerId, "containerId is required");
 
     this.checkoutId = checkoutId;
     this.containerId = containerId;
@@ -37,13 +37,13 @@ export default class Checkout extends EventEmitter2 {
   private getCheckoutUrl() {
     let baseUrl;
     switch (this.env) {
-      case 'production':
+      case "production":
         baseUrl = CHECKOUT_ENDPOINT_PROD;
         break;
-      case 'sandbox':
+      case "sandbox":
         baseUrl = CHECKOUT_ENDPOINT_SBX;
         break;
-      case 'development':
+      case "development":
         baseUrl = CHECKOUT_ENDPOINT_DEV;
         break;
       default:
@@ -54,17 +54,17 @@ export default class Checkout extends EventEmitter2 {
   }
 
   private createIframe(): HTMLIFrameElement {
-    const iframe = document.createElement('iframe');
+    const iframe = document.createElement("iframe");
     iframe.src = this.getCheckoutUrl();
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.border = 'none';
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.border = "none";
 
     return iframe;
   }
 
   private attactEventListeners(): void {
-    window.addEventListener('message', (event) => {
+    window.addEventListener("message", (event) => {
       if (Object.values(CheckoutEvent).includes(event.data)) {
         this.emit(event.data);
       }
@@ -79,7 +79,7 @@ export default class Checkout extends EventEmitter2 {
       throw new Error(`No container with id "${this.containerId}" found`);
     }
 
-    container.innerHTML = '';
+    container.innerHTML = "";
     container.appendChild(iframe);
     this.attactEventListeners();
   }
