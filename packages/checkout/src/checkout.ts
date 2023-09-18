@@ -50,7 +50,7 @@ export default class Checkout extends EventEmitter2 {
       // No default, as we assign default in the constructor
     }
 
-    return `${baseUrl}/v2/checkout/${this.checkoutId}/view?style=embedded`;
+    return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded`;
   }
 
   private createIframe(): HTMLIFrameElement {

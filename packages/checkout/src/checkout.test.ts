@@ -56,7 +56,7 @@ describe("@fung-sdk/checkout", () => {
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
-    expect(iframe?.src).toContain("https://app.fung.money");
+    expect(iframe?.src).toContain("https://pay.fungpayments.com");
   });
 
   it("should render a checkout iframe with env prod", () => {
@@ -69,7 +69,7 @@ describe("@fung-sdk/checkout", () => {
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
-    expect(iframe?.src).toContain("https://app.fung.money");
+    expect(iframe?.src).toContain("https://pay.fungpayments.com");
   });
 
   it("should render a checkout iframe for sandbox", () => {
@@ -82,7 +82,7 @@ describe("@fung-sdk/checkout", () => {
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
-    expect(iframe?.src).toContain("https://sbx.fung.money");
+    expect(iframe?.src).toContain("https://sbx.pay.fungpayments.com");
   });
 
   it("should render a checkout iframe for dev", () => {
@@ -95,7 +95,7 @@ describe("@fung-sdk/checkout", () => {
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
-    expect(iframe?.src).toContain("https://dev.fung.money");
+    expect(iframe?.src).toContain("https://dev.pay.fungpayments.com");
   });
 
   it("should dispatch a CHECKOUT_LOADED event", async () => {
