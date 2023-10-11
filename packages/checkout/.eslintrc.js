@@ -8,7 +8,7 @@ module.exports = {
     ecmaVersion: "latest",
     sourceType: "module",
     tsconfigRootDir: __dirname,
-    project: ["./tsconfig.eslint.json", "tsconfig.eslint.includes.json"],
+    project: ["./tsconfig.eslint.json"],
   },
   extends: [
     "airbnb",
