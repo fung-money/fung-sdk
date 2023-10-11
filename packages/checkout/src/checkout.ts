@@ -62,7 +62,7 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
 
-    const resizer = iframeResizer({ checkOrigin: false }, iframe); // eslint-disable-line no-use-before-define
+    const resizer = iframeResizer({ checkOrigin: false }, iframe); // eslint-disable-line
 
     return iframe;
   }
