@@ -14,15 +14,9 @@
     "module": "CommonJS",
     "moduleResolution": "Node",
     "outDir": "./dist",
-    "declarationDir": "./dist/types",
+    "declarationDir": "./dist/types"
   },
   "files": ["./index.ts"],
-  "include": [
-    "./src/**/*",
-    ".eslintrc.js",
-    "jest.config.mjs",
-  ],
-  "exclude": [
-    "src/**/*.test.ts",
-  ]
+  "include": ["./src/**/*", ".eslintrc.js", "jest.config.mjs"],
+  "exclude": ["src/**/*.test.ts"]
 }

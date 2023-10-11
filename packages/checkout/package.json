@@ -42,6 +42,7 @@
   "license": "ISC",
   "devDependencies": {
     "@jest/globals": "^29.5.0",
+    "@types/iframe-resizer": "^3.5.10",
     "@types/jest": "^29.4.0",
     "@types/jsdom": "^21.1.0",
     "@typescript-eslint/eslint-plugin": "^5.54.1",
@@ -60,6 +61,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "eventemitter2": "^6.4.9"
+    "eventemitter2": "^6.4.9",
+    "iframe-resizer": "^4.3.7"
   }
 }

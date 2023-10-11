@@ -1,3 +1,4 @@
+import iframeResizer from "iframe-resizer";
 import assert from "assert";
 import EventEmitter2 from "eventemitter2";
 import {
@@ -60,6 +61,8 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.minHeight = "650px";
     iframe.style.border = "none";
     iframe.className = "w-full";
+
+    iframeResizer({ checkOrigin: false }, iframe);
 
     return iframe;
   }
