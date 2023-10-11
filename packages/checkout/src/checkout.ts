@@ -56,9 +56,10 @@ export default class Checkout extends EventEmitter2 {
   private createIframe(): HTMLIFrameElement {
     const iframe = document.createElement("iframe");
     iframe.src = this.getCheckoutUrl();
-    iframe.style.width = "100%";
-    iframe.style.height = "100%";
+    iframe.style.minWidth = "400px";
+    iframe.style.minHeight = "650px";
     iframe.style.border = "none";
+    iframe.className = "w-full";
 
     return iframe;
   }
