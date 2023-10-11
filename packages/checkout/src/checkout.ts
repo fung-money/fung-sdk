@@ -62,7 +62,7 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
 
-    iframeResizer({ checkOrigin: false }, iframe);
+    const resizer = iframeResizer({ checkOrigin: false }, iframe);
 
     return iframe;
   }
