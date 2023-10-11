@@ -1,4 +1,4 @@
-import iframeResizer from "iframe-resizer";
+import { iframeResizer } from "iframe-resizer";
 import assert from "assert";
 import EventEmitter2 from "eventemitter2";
 import {
@@ -62,7 +62,7 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
 
-    const resizer = iframeResizer.iframeResizer({ checkOrigin: false }, iframe); // eslint-disable-line
+    const resizer = iframeResizer({ checkOrigin: false }, iframe); // eslint-disable-line
 
     return iframe;
   }
