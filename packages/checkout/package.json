@@ -63,7 +63,6 @@
   },
   "dependencies": {
     "eventemitter2": "^6.4.9",
-    "iframe-resizer": "^4.3.7",
-    "iframe-resizer-react": "^1.1.0"
+    "iframe-resizer": "^4.3.7"
   }
 }
