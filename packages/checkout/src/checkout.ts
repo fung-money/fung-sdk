@@ -1,5 +1,6 @@
 import assert from "assert";
 import EventEmitter2 from "eventemitter2";
+import iframeResizer from "iframe-resizer";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_PROD,
@@ -8,6 +9,7 @@ import {
 } from "./config.js";
 
 type Env = "production" | "sandbox" | "development";
+
 export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
 
@@ -61,10 +63,12 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
 
+    iframeResizer({ checkOrigin: false }, iframe);
+
     return iframe;
   }
 
-  private attactEventListeners(): void {
+  private attachEventListeners(): void {
     window.addEventListener("message", (event) => {
       if (Object.values(CheckoutEvent).includes(event.data)) {
         this.emit(event.data);
@@ -82,6 +86,6 @@ export default class Checkout extends EventEmitter2 {
 
     container.innerHTML = "";
     container.appendChild(iframe);
-    this.attactEventListeners();
+    this.attachEventListeners();
   }
 }
