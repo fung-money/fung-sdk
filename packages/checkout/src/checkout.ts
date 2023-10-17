@@ -1,6 +1,6 @@
 import assert from "assert";
 import EventEmitter2 from "eventemitter2";
-import iframeResizer from "iframe-resizer/js/iframeResizer";
+import iframeResizer from "iframe-resizer";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_PROD,
