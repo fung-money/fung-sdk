@@ -1,5 +1,6 @@
 import assert from "assert";
 import EventEmitter2 from "eventemitter2";
+import { iframeResizer } from "iframe-resizer";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_PROD,
@@ -8,6 +9,7 @@ import {
 } from "./config.js";
 
 type Env = "production" | "sandbox" | "development";
+
 export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
 
@@ -47,7 +49,7 @@ export default class Checkout extends EventEmitter2 {
         baseUrl = CHECKOUT_ENDPOINT_DEV;
         break;
       default:
-      // No default, as we assign default in the constructor
+        // No default, as we assign default in the constructor
     }
 
     return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded`;
@@ -56,14 +58,14 @@ export default class Checkout extends EventEmitter2 {
   private createIframe(): HTMLIFrameElement {
     const iframe = document.createElement("iframe");
     iframe.src = this.getCheckoutUrl();
-    iframe.style.width = "100%";
-    iframe.style.height = "100%";
     iframe.style.border = "none";
+
+    iframeResizer({ log: false }, iframe);
 
     return iframe;
   }
 
-  private attactEventListeners(): void {
+  private attachEventListeners(): void {
     window.addEventListener("message", (event) => {
       if (Object.values(CheckoutEvent).includes(event.data)) {
         this.emit(event.data);
@@ -81,6 +83,6 @@ export default class Checkout extends EventEmitter2 {
 
     container.innerHTML = "";
     container.appendChild(iframe);
-    this.attactEventListeners();
+    this.attachEventListeners();
   }
 }
