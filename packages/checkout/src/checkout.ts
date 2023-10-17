@@ -49,7 +49,7 @@ export default class Checkout extends EventEmitter2 {
         baseUrl = CHECKOUT_ENDPOINT_DEV;
         break;
       default:
-        // No default, as we assign default in the constructor
+      // No default, as we assign default in the constructor
     }
 
     return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded`;
@@ -58,9 +58,12 @@ export default class Checkout extends EventEmitter2 {
   private createIframe(): HTMLIFrameElement {
     const iframe = document.createElement("iframe");
     iframe.src = this.getCheckoutUrl();
+    iframe.style.minWidth = "400px";
+    iframe.style.minHeight = "650px";
     iframe.style.border = "none";
+    iframe.className = "w-full";
 
-    iframeResizer({ log: false }, iframe);
+    iframeResizer({ checkOrigin: false }, iframe);
 
     return iframe;
   }
