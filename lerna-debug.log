@@ -1,0 +1,69 @@
+0 silly argv {
+0 silly argv   _: [ 'version' ],
+0 silly argv   lernaVersion: '6.5.1',
+0 silly argv   '$0': '/Users/jb/Desktop/FUNG/Fung_SDK/fung-sdk/node_modules/.bin/lerna'
+0 silly argv }
+1 notice cli v6.5.1
+2 verbose rootPath /Users/jb/Desktop/FUNG/Fung_SDK/fung-sdk
+3 info current version 1.2.0
+4 silly isAnythingCommitted
+5 verbose isAnythingCommitted 1
+6 silly getCurrentBranch
+7 verbose currentBranch main
+8 silly remoteBranchExists
+9 silly isBehindUpstream
+10 silly isBehindUpstream main is behind origin/main by 0 commit(s) and ahead by 0
+11 silly hasTags
+12 verbose hasTags true
+13 silly git-describe.sync "v1.2.0-2-g5361806" => {"lastTagName":"v1.2.0","lastVersion":"v1.2.0","refCount":"2","sha":"5361806","isDirty":false}
+14 info Looking for changed packages since v1.2.0
+15 silly checking diff packages/checkout
+16 silly found diff in packages/checkout/package.json
+16 silly found diff in packages/checkout/src/checkout.test.ts
+16 silly found diff in packages/checkout/src/checkout.ts
+16 silly found diff in packages/checkout/src/config.ts
+17 verbose filtered diff [
+17 verbose filtered diff   'packages/checkout/package.json',
+17 verbose filtered diff   'packages/checkout/src/checkout.test.ts',
+17 verbose filtered diff   'packages/checkout/src/checkout.ts',
+17 verbose filtered diff   'packages/checkout/src/config.ts'
+17 verbose filtered diff ]
+18 verbose updated @fung-sdk/checkout
+19 verbose git-describe undefined => "v1.2.0-2-g5361806"
+20 silly git-describe parsed => {"lastTagName":"v1.2.0","lastVersion":"v1.2.0","refCount":"2","sha":"5361806","isDirty":false}
+21 info execute Skipping releases
+22 silly lifecycle No script for "preversion" in "fung-sdk", continuing
+23 silly lifecycle No script for "preversion" in "@fung-sdk/checkout", continuing
+24 silly lifecycle No script for "version" in "@fung-sdk/checkout", continuing
+25 verbose version Updating root package-lock.json
+26 silly lifecycle No script for "version" in "fung-sdk", continuing
+27 silly gitAdd [
+27 silly gitAdd   'packages/checkout/package.json',
+27 silly gitAdd   'packages/checkout/package-lock.json',
+27 silly gitAdd   'lerna.json',
+27 silly gitAdd   'package-lock.json'
+27 silly gitAdd ]
+28 silly gitCommit v1.3.0
+29 verbose git [ 'commit', '-m', 'v1.3.0' ]
+30 silly gitTag v1.3.0 git tag %s -m %s
+31 verbose git [ 'tag', 'v1.3.0', '-m', 'v1.3.0' ]
+32 silly lifecycle No script for "postversion" in "@fung-sdk/checkout", continuing
+33 silly lifecycle No script for "postversion" in "fung-sdk", continuing
+34 info git Pushing tags...
+35 silly gitPush origin main
+36 warn gitPush remote: error: GH006: Protected branch update failed for refs/heads/main.
+36 warn gitPush remote: error: Changes must be made through a pull request.
+36 warn gitPush To https://github.com/fung-money/fung-sdk.git
+36 warn gitPush  ! [remote rejected] main -> main (protected branch hook declined)
+36 warn gitPush  ! [remote rejected] v1.3.0 -> v1.3.0 (atomic transaction failed)
+36 warn gitPush error: failed to push some refs to 'https://github.com/fung-money/fung-sdk.git'
+37 info gitPush --atomic failed, attempting non-atomic push
+38 error Error: Command failed with exit code 1: git push --follow-tags --no-verify origin main
+38 error remote: error: GH006: Protected branch update failed for refs/heads/main.
+38 error remote: error: Changes must be made through a pull request.
+38 error To https://github.com/fung-money/fung-sdk.git
+38 error  * [new tag]         v1.3.0 -> v1.3.0
+38 error  ! [remote rejected] main -> main (protected branch hook declined)
+38 error error: failed to push some refs to 'https://github.com/fung-money/fung-sdk.git'
+38 error     at makeError (/Users/jb/Desktop/FUNG/Fung_SDK/fung-sdk/node_modules/execa/lib/error.js:59:11)
+38 error     at handlePromise (/Users/jb/Desktop/FUNG/Fung_SDK/fung-sdk/node_modules/execa/index.js:114:26)
