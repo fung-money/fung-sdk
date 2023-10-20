@@ -62,9 +62,9 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
 
-    const iFrameResize = require("iframe-resizer/js/iframeResizer.js"); // eslint-disable-line
-
-    iFrameResize({ checkOrigin: false }, iframe);
+    import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
+      iFrameResize({ checkOrigin: false }, iframe);
+    });
 
     return iframe;
   }
