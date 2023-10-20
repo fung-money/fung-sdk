@@ -2,7 +2,7 @@ import { JSDOM } from "jsdom";
 import Checkout from "./checkout.js";
 import { CheckoutEvent } from "./config.js";
 
-jest.mock("iframe-resizer", () => {
+jest.mock("iframe-resizer/js/iframeResizer.js", () => {
   return jest.fn().mockImplementation(() => {
     return {
       // whatever mock implementation or properties you want here
@@ -11,7 +11,6 @@ jest.mock("iframe-resizer", () => {
     };
   });
 });
-
 
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
@@ -40,7 +39,7 @@ describe("@fung-sdk/checkout", () => {
       containerId: "random",
     });
     expect(() => checkout.render()).toThrowError(
-      "No container with id \"random\" found",
+      'No container with id "random" found'
     );
   });
 
