@@ -2,16 +2,11 @@ import { JSDOM } from "jsdom";
 import Checkout from "./checkout.js";
 import { CheckoutEvent } from "./config.js";
 
-jest.mock("iframe-resizer", () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      // whatever mock implementation or properties you want here
-      close: jest.fn(),
-      resize: jest.fn(),
-    };
-  });
-});
-
+jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementation(() => ({
+  // whatever mock implementation or properties you want here
+  close: jest.fn(),
+  resize: jest.fn(),
+})));
 
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {

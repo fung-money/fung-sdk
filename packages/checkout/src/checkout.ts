@@ -1,6 +1,5 @@
 import assert from "assert";
 import EventEmitter2 from "eventemitter2";
-import iframeResizer from "iframe-resizer";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_PROD,
@@ -63,7 +62,9 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
 
-    iframeResizer({ checkOrigin: false }, iframe);
+    const iFrameResize = require("iframe-resizer/js/iframeResizer.js"); // eslint-disable-line
+
+    iFrameResize({ checkOrigin: false }, iframe);
 
     return iframe;
   }
