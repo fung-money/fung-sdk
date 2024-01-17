@@ -9,4 +9,6 @@ export enum CheckoutEvent {
   Invalid = "checkout:invalid",
   Completed = "checkout:completed",
   Failed = "checkout:failed",
+  ResizeFull = "resize:full",
+  ResizeReset = "resize:reset",
 }

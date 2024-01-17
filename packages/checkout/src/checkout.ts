@@ -18,6 +18,8 @@ export default class Checkout extends EventEmitter2 {
 
   protected url: string | null;
 
+  protected iframe: HTMLIFrameElement | null = null;
+
   constructor({
     checkoutId,
     containerId,
@@ -41,7 +43,7 @@ export default class Checkout extends EventEmitter2 {
   }
 
   private getCheckoutUrl() {
-    if (this.url) return this.url;
+    if (this.url) return `${this.url}?style=embedded`;
 
     let baseUrl;
     switch (this.env) {
@@ -66,6 +68,7 @@ export default class Checkout extends EventEmitter2 {
 
   private createIframe(): HTMLIFrameElement {
     const iframe = document.createElement("iframe");
+    this.iframe = iframe;
     iframe.src = this.getCheckoutUrl();
     iframe.style.minWidth = "400px";
     iframe.style.minHeight = "650px";
@@ -85,6 +88,22 @@ export default class Checkout extends EventEmitter2 {
         this.emit(event.data);
       }
     });
+  }
+
+  resize(event: string): void {
+    if (event === CheckoutEvent.ResizeFull && this.iframe !== null) {
+      this.iframe.style.width = "100vw";
+      this.iframe.style.height = "100vh";
+      this.iframe.style.minWidth = "0px";
+      this.iframe.style.minHeight = "0px";
+      this.iframe.style.border = "none";
+    } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
+      this.iframe.style.minWidth = "400px";
+      this.iframe.style.minHeight = "650px";
+      this.iframe.style.border = "none";
+      this.iframe.style.width = "auto";
+      this.iframe.style.height = "auto";
+    }
   }
 
   render(): void {
