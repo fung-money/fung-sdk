@@ -16,14 +16,18 @@ export default class Checkout extends EventEmitter2 {
 
   protected env: Env;
 
+  protected url: string | null;
+
   constructor({
     checkoutId,
     containerId,
     env = "production",
+    url = null,
   }: {
     checkoutId: string;
     containerId: string;
     env?: Env;
+    url?: string | null;
   }) {
     super();
 
@@ -33,9 +37,12 @@ export default class Checkout extends EventEmitter2 {
     this.checkoutId = checkoutId;
     this.containerId = containerId;
     this.env = env;
+    this.url = url;
   }
 
   private getCheckoutUrl() {
+    if (this.url) return this.url;
+
     let baseUrl;
     switch (this.env) {
       case "production":
