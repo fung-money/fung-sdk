@@ -102,6 +102,19 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.src).toContain("https://dev.pay.fungpayments.com");
   });
 
+  it("should render a checkout iframe for local", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      env: "local",
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("http://localhost:3000");
+  });
+
   it("should dispatch a CHECKOUT_LOADED event", async () => {
     const checkout = new Checkout({
       checkoutId: "abc",
@@ -121,5 +134,19 @@ describe("@fung-sdk/checkout", () => {
 
     expect(iframe).not.toBeNull();
     expect(mockFn).toHaveBeenCalled();
+  });
+
+  it("should render a checkout iframe with a custom url", () => {
+    const customUrl = "https://custom.url/checkout";
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      url: customUrl,
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain(customUrl); // iframe src should contain the custom URL
   });
 });

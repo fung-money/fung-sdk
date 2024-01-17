@@ -55,7 +55,7 @@ export default class Checkout extends EventEmitter2 {
         baseUrl = CHECKOUT_ENDPOINT_DEV;
         break;
       case "local":
-        baseUrl = CHECKOUT_ENDPOINT_LOCAL
+        baseUrl = CHECKOUT_ENDPOINT_LOCAL;
         break;
       default:
       // No default, as we assign default in the constructor
