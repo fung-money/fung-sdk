@@ -1,13 +1,13 @@
 import assert from "assert";
 import EventEmitter2 from "eventemitter2";
 import {
-  CHECKOUT_ENDPOINT_DEV,
+  CHECKOUT_ENDPOINT_DEV, CHECKOUT_ENDPOINT_LOCAL,
   CHECKOUT_ENDPOINT_PROD,
   CHECKOUT_ENDPOINT_SBX,
   CheckoutEvent,
 } from "./config.js";
 
-type Env = "production" | "sandbox" | "development";
+export type Env = "production" | "sandbox" | "development" | "local";
 
 export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
@@ -16,14 +16,18 @@ export default class Checkout extends EventEmitter2 {
 
   protected env: Env;
 
+  protected url: string | null;
+
   constructor({
     checkoutId,
     containerId,
     env = "production",
+    url = null,
   }: {
     checkoutId: string;
     containerId: string;
     env?: Env;
+    url?: string | null;
   }) {
     super();
 
@@ -33,9 +37,12 @@ export default class Checkout extends EventEmitter2 {
     this.checkoutId = checkoutId;
     this.containerId = containerId;
     this.env = env;
+    this.url = url;
   }
 
   private getCheckoutUrl() {
+    if (this.url) return this.url;
+
     let baseUrl;
     switch (this.env) {
       case "production":
@@ -46,6 +53,9 @@ export default class Checkout extends EventEmitter2 {
         break;
       case "development":
         baseUrl = CHECKOUT_ENDPOINT_DEV;
+        break;
+      case "local":
+        baseUrl = CHECKOUT_ENDPOINT_LOCAL
         break;
       default:
       // No default, as we assign default in the constructor
