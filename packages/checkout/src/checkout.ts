@@ -20,16 +20,20 @@ export default class Checkout extends EventEmitter2 {
 
   protected iframe: HTMLIFrameElement | null = null;
 
+  protected small: boolean = false;
+
   constructor({
     checkoutId,
     containerId,
     env = "production",
     url = null,
+    small = false,
   }: {
     checkoutId: string;
     containerId: string;
     env?: Env;
     url?: string | null;
+    small?: boolean;
   }) {
     super();
 
@@ -40,6 +44,7 @@ export default class Checkout extends EventEmitter2 {
     this.containerId = containerId;
     this.env = env;
     this.url = url;
+    this.small = small;
   }
 
   private getCheckoutUrl() {
@@ -70,10 +75,17 @@ export default class Checkout extends EventEmitter2 {
     const iframe = document.createElement("iframe");
     this.iframe = iframe;
     iframe.src = this.getCheckoutUrl();
-    iframe.style.minWidth = "400px";
-    iframe.style.minHeight = "650px";
+
     iframe.style.border = "none";
     iframe.className = "w-full";
+
+    if (!this.small) {
+      iframe.style.minWidth = "400px";
+      iframe.style.minHeight = "650px";
+    } else {
+      iframe.style.width = "auto";
+      iframe.style.height = "auto";
+    }
 
     import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
       iFrameResize({ checkOrigin: false }, iframe);
@@ -85,24 +97,40 @@ export default class Checkout extends EventEmitter2 {
   private attachEventListeners(): void {
     window.addEventListener("message", (event) => {
       if (Object.values(CheckoutEvent).includes(event.data)) {
-        this.emit(event.data);
+        if (event.data === CheckoutEvent.ResizeFull) {
+          this.resize(CheckoutEvent.ResizeFull);
+        } else if (event.data === CheckoutEvent.ResizeReset) {
+          this.resize(CheckoutEvent.ResizeReset);
+        } else {
+          this.emit(event.data);
+        }
       }
     });
   }
 
-  resize(event: string): void {
+  private resize(event: string): void {
     if (event === CheckoutEvent.ResizeFull && this.iframe !== null) {
       this.iframe.style.width = "100vw";
       this.iframe.style.height = "100vh";
       this.iframe.style.minWidth = "0px";
       this.iframe.style.minHeight = "0px";
       this.iframe.style.border = "none";
+      this.iframe.style.position = "absolute";
+      this.iframe.style.top = "0";
+      this.iframe.style.left = "0";
+      this.iframe.style.zIndex = "9999";
     } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
-      this.iframe.style.minWidth = "400px";
-      this.iframe.style.minHeight = "650px";
+      if (!this.small) {
+        this.iframe.style.minWidth = "400px";
+        this.iframe.style.minHeight = "650px";
+      }
       this.iframe.style.border = "none";
       this.iframe.style.width = "auto";
       this.iframe.style.height = "auto";
+      this.iframe.style.position = "relative";
+      this.iframe.style.top = "0";
+      this.iframe.style.left = "0";
+      this.iframe.style.zIndex = "0";
     }
   }
 

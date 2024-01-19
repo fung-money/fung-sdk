@@ -176,7 +176,6 @@ describe("@fung-sdk/checkout", () => {
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
-    // checking css
     expect(iframe?.style.width).toEqual("auto");
     expect(iframe?.style.height).toEqual("auto");
     expect(iframe?.style.minWidth).toEqual("400px");
