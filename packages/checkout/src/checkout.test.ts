@@ -200,6 +200,7 @@ describe("@fung-sdk/checkout", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
+      small: true,
     });
 
     checkout.render();
@@ -217,6 +218,7 @@ describe("@fung-sdk/checkout", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
+      small: true,
     });
 
     checkout.render();
