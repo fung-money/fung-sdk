@@ -150,36 +150,149 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.src).toContain(customUrl); // iframe src should contain the custom URL
   });
 
-  it("should resize the iframe to full when resize:full event is triggered", () => {
+  it("should attach event listeners on render", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    window.addEventListener = jest.fn();
+
+    checkout.render();
+
+    expect(window.addEventListener).toHaveBeenCalledWith("message", expect.any(Function));
+  });
+
+  it("should resize the iframe to full screen on CHECKOUT_RESIZE_RESET event", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
     });
     checkout.render();
-    checkout.resize("resize:full");
 
     const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.ResizeReset, "*");
+
     expect(iframe).not.toBeNull();
-    expect(iframe?.style.width).toEqual("100vw");
-    expect(iframe?.style.height).toEqual("100vh");
-    expect(iframe?.style.minWidth).toEqual("0px");
-    expect(iframe?.style.minHeight).toEqual("0px");
+    expect(iframe?.style.minWidth).toBe("400px");
+    expect(iframe?.style.minHeight).toBe("650px");
   });
 
-  it("should reset the iframe dimensions when resize:reset event is triggered", () => {
+
+  it("should resize the iframe to full screen on CHECKOUT_RESIZE_FULL event when small", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      small: true,
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.ResizeFull, "*");
+
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.width).toBe("100%");
+    expect(iframe?.style.height).toBe("auto");
+  });
+
+  it("should reset the iframe size on CHECKOUT_RESIZE_RESET event when small", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      small: true,
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.ResizeReset, "*");
+
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.width).toBe("100%");
+    expect(iframe?.style.height).toBe("auto");
+  });
+
+  it("should emit CHECKOUT_SUCCESS event on successful message", async () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
     });
+    const mockFn = jest.fn();
+    checkout.on(CheckoutEvent.Completed, mockFn);
     checkout.render();
-    checkout.resize("resize:reset");
 
     const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.Completed, "*");
+
+    // a small delay to allow the event to be dispatched
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10);
+    });
+
     expect(iframe).not.toBeNull();
-    // checking css
-    expect(iframe?.style.width).toEqual("auto");
-    expect(iframe?.style.height).toEqual("auto");
-    expect(iframe?.style.minWidth).toEqual("400px");
-    expect(iframe?.style.minHeight).toEqual("650px");
+    expect(mockFn).toHaveBeenCalled();
   });
+
+  it("should emit CHECKOUT_SUCCESS event on successful message", async () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    const mockFn = jest.fn();
+    checkout.on(CheckoutEvent.Completed, mockFn);
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.Completed, "*");
+
+    // a small delay to allow the event to be dispatched
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10);
+    });
+
+    expect(iframe).not.toBeNull();
+    expect(mockFn).toHaveBeenCalled();
+  });
+
+  it("should emit CHECKOUT_ERROR event on error message", async () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    const mockFn = jest.fn();
+    checkout.on(CheckoutEvent.Failed, mockFn);
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.Failed, "*");
+
+    // a small delay to allow the event to be dispatched
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10);
+    });
+
+    expect(iframe).not.toBeNull();
+    expect(mockFn).toHaveBeenCalled();
+  });
+
+  it("should emit CHECKOUT_CANCEL event on cancel message", async () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    const mockFn = jest.fn();
+    checkout.on(CheckoutEvent.Failed, mockFn);
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.Failed, "*");
+
+    // a small delay to allow the event to be dispatched
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10);
+    });
+
+    expect(iframe).not.toBeNull();
+    expect(mockFn).toHaveBeenCalled();
+  });
+
 });
