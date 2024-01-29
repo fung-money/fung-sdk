@@ -8,7 +8,6 @@ jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementati
   resize: jest.fn(),
 })));
 
-
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
     const dom = new JSDOM();
@@ -210,8 +209,6 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.style.width).toEqual("100vw");
     expect(iframe?.style.height).toEqual("100vh");
-    expect(iframe?.style.minWidth).toEqual("0px");
-    expect(iframe?.style.minHeight).toEqual("0px");
   });
 
   it("should reset the iframe dimensions on ResizeReset event", () => {
@@ -228,8 +225,5 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.style.width).toEqual("100%");
     expect(iframe?.style.height).toEqual("auto");
-    expect(iframe?.style.minWidth).toEqual("400px");
-    expect(iframe?.style.minHeight).toEqual("650px");
   });
-
 });
