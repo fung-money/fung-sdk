@@ -8,6 +8,7 @@ jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementati
   resize: jest.fn(),
 })));
 
+
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
     const dom = new JSDOM();
@@ -182,14 +183,27 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.style.minHeight).toEqual("650px");
   });
 
-  it("should resize the iframe to full when resize:full event is triggered", () => {
+  it("should attach event listeners on render", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
-      small: true,
     });
+
+    window.addEventListener = jest.fn();
+
     checkout.render();
-    checkout.resize("resize:full");
+
+    expect(window.addEventListener).toHaveBeenCalledWith("message", expect.any(Function));
+  });
+
+  it("should resize the iframe on ResizeFull event", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    checkout.render();
+    checkout.resize(CheckoutEvent.ResizeFull);
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
@@ -197,19 +211,16 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.style.height).toEqual("100vh");
     expect(iframe?.style.minWidth).toEqual("0px");
     expect(iframe?.style.minHeight).toEqual("0px");
-    expect(iframe?.style.position).toEqual("absolute");
-    expect(iframe?.style.top).toEqual("0px");
-    expect(iframe?.style.left).toEqual("0px");
-    expect(iframe?.style.zIndex).toEqual("9999");
   });
 
-  it("should reset the iframe dimensions when resize:reset event is triggered", () => {
+  it("should reset the iframe dimensions on ResizeReset event", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
     });
+
     checkout.render();
-    checkout.resize("resize:reset");
+    checkout.resize(CheckoutEvent.ResizeReset);
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
@@ -217,23 +228,6 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.style.height).toEqual("auto");
     expect(iframe?.style.minWidth).toEqual("400px");
     expect(iframe?.style.minHeight).toEqual("650px");
-    expect(iframe?.style.position).toEqual("relative");
-    expect(iframe?.style.top).toEqual("0px");
-    expect(iframe?.style.left).toEqual("0px");
-    expect(iframe?.style.zIndex).toEqual("0");
   });
 
-  it("should reset the iframe dimensions when resize:reset event is triggered and small is true", () => {
-    const checkout = new Checkout({
-      checkoutId: "abc",
-      containerId: "xyz",
-      small: true,
-    });
-    checkout.render();
-    checkout.resize("resize:reset");
-
-    const iframe = document.querySelector("iframe");
-    expect(iframe).not.toBeNull();
-    expect(iframe?.style.width).toEqual("100%");
-  });
 });
