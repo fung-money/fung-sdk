@@ -83,7 +83,7 @@ export default class Checkout extends EventEmitter2 {
       iframe.style.minWidth = "400px";
       iframe.style.minHeight = "650px";
     } else {
-      iframe.style.width = "auto";
+      iframe.style.width = "100%";
       iframe.style.height = "auto";
     }
 
@@ -125,7 +125,7 @@ export default class Checkout extends EventEmitter2 {
         this.iframe.style.minHeight = "650px";
       }
       this.iframe.style.border = "none";
-      this.iframe.style.width = "auto";
+      this.iframe.style.width = "100%";
       this.iframe.style.height = "auto";
       this.iframe.style.position = "relative";
       this.iframe.style.top = "0";
