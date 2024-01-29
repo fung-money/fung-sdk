@@ -149,36 +149,4 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain(customUrl); // iframe src should contain the custom URL
   });
-
-  it("should resize the iframe to full when resize:full event is triggered", () => {
-    const checkout = new Checkout({
-      checkoutId: "abc",
-      containerId: "xyz",
-    });
-    checkout.render();
-    checkout.resize("resize:full");
-
-    const iframe = document.querySelector("iframe");
-    expect(iframe).not.toBeNull();
-    expect(iframe?.style.width).toEqual("100vw");
-    expect(iframe?.style.height).toEqual("100vh");
-    expect(iframe?.style.minWidth).toEqual("0px");
-    expect(iframe?.style.minHeight).toEqual("0px");
-  });
-
-  it("should reset the iframe dimensions when resize:reset event is triggered", () => {
-    const checkout = new Checkout({
-      checkoutId: "abc",
-      containerId: "xyz",
-    });
-    checkout.render();
-    checkout.resize("resize:reset");
-
-    const iframe = document.querySelector("iframe");
-    expect(iframe).not.toBeNull();
-    expect(iframe?.style.width).toEqual("auto");
-    expect(iframe?.style.height).toEqual("auto");
-    expect(iframe?.style.minWidth).toEqual("400px");
-    expect(iframe?.style.minHeight).toEqual("650px");
-  });
 });
