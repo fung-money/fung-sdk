@@ -222,4 +222,25 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.style.left).toEqual("0px");
     expect(iframe?.style.zIndex).toEqual("0");
   });
+
+  it("should reset the iframe dimensions when resize:reset event is triggered and small is true", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      small: true,
+    });
+    checkout.render();
+    checkout.resize("resize:reset");
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.width).toEqual("100%");
+    expect(iframe?.style.height).toEqual("auto");
+    expect(iframe?.style.minWidth).toEqual("0px");
+    expect(iframe?.style.minHeight).toEqual("0px");
+    expect(iframe?.style.position).toEqual("relative");
+    expect(iframe?.style.top).toEqual("0px");
+    expect(iframe?.style.left).toEqual("0px");
+    expect(iframe?.style.zIndex).toEqual("0");
+  });
 });
