@@ -108,7 +108,7 @@ export default class Checkout extends EventEmitter2 {
     });
   }
 
-  private resize(event: string): void {
+  resize(event: string): void {
     if (event === CheckoutEvent.ResizeFull && this.iframe !== null) {
       this.iframe.style.width = "100vw";
       this.iframe.style.height = "100vh";
