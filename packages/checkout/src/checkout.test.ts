@@ -186,6 +186,7 @@ describe("@fung-sdk/checkout", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
+      small: true,
     });
     checkout.render();
     checkout.resize("resize:full");
@@ -219,6 +220,6 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.style.position).toEqual("relative");
     expect(iframe?.style.top).toEqual("0px");
     expect(iframe?.style.left).toEqual("0px");
-    expect(iframe?.style.zIndex).toEqual("0px");
+    expect(iframe?.style.zIndex).toEqual("0");
   });
 });
