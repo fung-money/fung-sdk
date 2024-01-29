@@ -176,9 +176,49 @@ describe("@fung-sdk/checkout", () => {
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
-    expect(iframe?.style.width).toEqual("auto");
+    expect(iframe?.style.width).toEqual("100%");
     expect(iframe?.style.height).toEqual("auto");
     expect(iframe?.style.minWidth).toEqual("400px");
     expect(iframe?.style.minHeight).toEqual("650px");
+  });
+
+  it("should resize the iframe to full when resize:full event is triggered", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    checkout.render();
+    checkout.resize("resize:full");
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.width).toEqual("100vw");
+    expect(iframe?.style.height).toEqual("100vh");
+    expect(iframe?.style.minWidth).toEqual("0px");
+    expect(iframe?.style.minHeight).toEqual("0px");
+    expect(iframe?.style.position).toEqual("absolute");
+    expect(iframe?.style.top).toEqual("0");
+    expect(iframe?.style.left).toEqual("0");
+    expect(iframe?.style.zIndex).toEqual("9999");
+  });
+
+  it("should reset the iframe dimensions when resize:reset event is triggered", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    checkout.render();
+    checkout.resize("resize:reset");
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.width).toEqual("100%");
+    expect(iframe?.style.height).toEqual("auto");
+    expect(iframe?.style.minWidth).toEqual("400px");
+    expect(iframe?.style.minHeight).toEqual("650px");
+    expect(iframe?.style.position).toEqual("relative");
+    expect(iframe?.style.top).toEqual("0");
+    expect(iframe?.style.left).toEqual("0");
+    expect(iframe?.style.zIndex).toEqual("0");
   });
 });
