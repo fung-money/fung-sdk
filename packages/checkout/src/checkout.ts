@@ -1,7 +1,8 @@
 import assert from "assert";
 import EventEmitter2 from "eventemitter2";
 import {
-  CHECKOUT_ENDPOINT_DEV, CHECKOUT_ENDPOINT_LOCAL,
+  CHECKOUT_ENDPOINT_DEV,
+  CHECKOUT_ENDPOINT_LOCAL,
   CHECKOUT_ENDPOINT_PROD,
   CHECKOUT_ENDPOINT_SBX,
   CheckoutEvent,
@@ -78,6 +79,7 @@ export default class Checkout extends EventEmitter2 {
 
     iframe.style.border = "none";
     iframe.className = "w-full";
+    iframe.allow = "payment *";
 
     if (!this.small) {
       iframe.style.minWidth = "400px";
