@@ -17,7 +17,7 @@ export default {
   collectCoverageFrom: ["./src/**"],
   coverageThreshold: {
     global: {
-      lines: 98,
+      lines: 100,
     },
   },
   testPathIgnorePatterns: ["/node_modules/", "/dist/"],

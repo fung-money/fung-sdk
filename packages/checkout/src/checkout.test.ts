@@ -197,6 +197,24 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.style.minHeight).toBe("650px");
   });
 
+  it("should resize the iframe to full screen on CHECKOUT_RESIZE_RESET event, and keep the set height when small=true", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      small: true,
+      height: "100px",
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.ResizeReset, "*");
+
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.minWidth).toBe("");
+    expect(iframe?.style.minHeight).toBe("");
+    expect(iframe?.style.height).toBe("100px");
+  });
+
   it("should resize the iframe to full screen on CHECKOUT_RESIZE_FULL event when small", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
