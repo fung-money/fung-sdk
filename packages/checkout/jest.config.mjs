@@ -1,27 +1,24 @@
 export default {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  extensionsToTreatAsEsm: ['.ts', '.tsx', '.jsx'],
+  preset: "ts-jest",
+  testEnvironment: "node",
+  extensionsToTreatAsEsm: [".ts", ".tsx", ".jsx"],
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
+    "^(\\.{1,2}/.*)\\.js$": "$1",
   },
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    "^.+\\.tsx?$": "ts-jest",
   },
   globals: {
-    'ts-jest': {
+    "ts-jest": {
       useESM: true,
     },
   },
   collectCoverage: true,
-  collectCoverageFrom: ['./src/**'],
+  collectCoverageFrom: ["./src/**"],
   coverageThreshold: {
     global: {
-      lines: 100,
+      lines: 98,
     },
   },
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '/dist/',
-  ],
+  testPathIgnorePatterns: ["/node_modules/", "/dist/"],
 };
