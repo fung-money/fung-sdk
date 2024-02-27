@@ -23,18 +23,22 @@ export default class Checkout extends EventEmitter2 {
 
   protected small: boolean = false;
 
+  protected setMinWidth: boolean = true;
+
   constructor({
     checkoutId,
     containerId,
     env = "production",
     url = null,
     small = false,
+    setMinWidth = true,
   }: {
     checkoutId: string;
     containerId: string;
     env?: Env;
     url?: string | null;
     small?: boolean;
+    setMinWidth?: boolean;
   }) {
     super();
 
@@ -46,6 +50,7 @@ export default class Checkout extends EventEmitter2 {
     this.env = env;
     this.url = url;
     this.small = small;
+    this.setMinWidth = setMinWidth;
   }
 
   private getCheckoutUrl() {
@@ -82,7 +87,9 @@ export default class Checkout extends EventEmitter2 {
     iframe.allow = "payment *";
 
     if (!this.small) {
-      iframe.style.minWidth = "400px";
+      if (this.setMinWidth) {
+        iframe.style.minWidth = "400px";
+      }
       iframe.style.minHeight = "650px";
     } else {
       iframe.style.width = "100%";
@@ -123,7 +130,9 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.zIndex = "9999";
     } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
       if (!this.small) {
-        this.iframe.style.minWidth = "400px";
+        if (this.setMinWidth) {
+          this.iframe.style.minWidth = "400px";
+        }
         this.iframe.style.minHeight = "650px";
       }
       this.iframe.style.border = "none";
