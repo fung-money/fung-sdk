@@ -2,11 +2,13 @@ import { JSDOM } from "jsdom";
 import Checkout from "./checkout.js";
 import { CheckoutEvent } from "./config.js";
 
-jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementation(() => ({
-  // whatever mock implementation or properties you want here
-  close: jest.fn(),
-  resize: jest.fn(),
-})));
+jest.mock("iframe-resizer/js/iframeResizer.js", () =>
+  jest.fn().mockImplementation(() => ({
+    // whatever mock implementation or properties you want here
+    close: jest.fn(),
+    resize: jest.fn(),
+  }))
+);
 
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
@@ -35,7 +37,7 @@ describe("@fung-sdk/checkout", () => {
       containerId: "random",
     });
     expect(() => checkout.render()).toThrowError(
-      "No container with id \"random\" found",
+      'No container with id "random" found'
     );
   });
 
@@ -74,6 +76,20 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain("https://pay.fungpayments.com");
+  });
+
+  it("should optionally set height for small=true", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      small: true,
+      height: "100px",
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.minHeight).toEqual("100px");
   });
 
   it("should render a checkout iframe for sandbox", () => {
@@ -160,7 +176,10 @@ describe("@fung-sdk/checkout", () => {
 
     checkout.render();
 
-    expect(window.addEventListener).toHaveBeenCalledWith("message", expect.any(Function));
+    expect(window.addEventListener).toHaveBeenCalledWith(
+      "message",
+      expect.any(Function)
+    );
   });
 
   it("should resize the iframe to full screen on CHECKOUT_RESIZE_RESET event", () => {
@@ -178,6 +197,22 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.style.minHeight).toBe("650px");
   });
 
+  it("should resize the iframe to full screen on CHECKOUT_RESIZE_RESET event, and keep the set height when small=true", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      small: true,
+      height: "100px",
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.ResizeReset, "*");
+
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.minWidth).toBe("");
+    expect(iframe?.style.minHeight).toBe("100px");
+  });
 
   it("should resize the iframe to full screen on CHECKOUT_RESIZE_FULL event when small", () => {
     const checkout = new Checkout({
@@ -294,5 +329,4 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(mockFn).toHaveBeenCalled();
   });
-
 });
