@@ -89,7 +89,7 @@ describe("@fung-sdk/checkout", () => {
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
-    expect(iframe?.style.height).toEqual("100px");
+    expect(iframe?.style.minHeight).toEqual("100px");
   });
 
   it("should render a checkout iframe for sandbox", () => {
@@ -211,8 +211,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(iframe).not.toBeNull();
     expect(iframe?.style.minWidth).toBe("");
-    expect(iframe?.style.minHeight).toBe("");
-    expect(iframe?.style.height).toBe("100px");
+    expect(iframe?.style.minHeight).toBe("100px");
   });
 
   it("should resize the iframe to full screen on CHECKOUT_RESIZE_FULL event when small", () => {
