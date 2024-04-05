@@ -1,5 +1,5 @@
-import assert from "assert";
 import EventEmitter2 from "eventemitter2";
+import { iframeResizer } from "iframe-resizer";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_LOCAL,
@@ -13,7 +13,7 @@ export type Env = "production" | "sandbox" | "development" | "local";
 export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
 
-  protected containerId: string;
+  protected container: HTMLElement | null = null;
 
   protected env: Env;
 
@@ -27,6 +27,7 @@ export default class Checkout extends EventEmitter2 {
 
   constructor({
     checkoutId,
+    container,
     containerId,
     env = "production",
     url = null,
@@ -34,7 +35,8 @@ export default class Checkout extends EventEmitter2 {
     height,
   }: {
     checkoutId: string;
-    containerId: string;
+    container?: HTMLElement;
+    containerId?: string;
     env?: Env;
     url?: string | null;
     small?: boolean;
@@ -42,11 +44,11 @@ export default class Checkout extends EventEmitter2 {
   }) {
     super();
 
-    assert(checkoutId, "checkoutId is required");
-    assert(containerId, "containerId is required");
+    if (!checkoutId) throw new Error("checkoutId is required");
+    if (!container && !containerId) throw new Error("Either container or containerId is required");
 
     this.checkoutId = checkoutId;
-    this.containerId = containerId;
+    this.container = container || document.getElementById(containerId || "");
     this.env = env;
     this.url = url;
     this.small = small;
@@ -98,25 +100,25 @@ export default class Checkout extends EventEmitter2 {
       }
     }
 
-    import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
-      iFrameResize({ checkOrigin: false }, iframe);
-    });
+    iframeResizer({ checkOrigin: false }, iframe);
 
     return iframe;
   }
 
-  private attachEventListeners(): void {
-    window.addEventListener("message", (event) => {
-      if (Object.values(CheckoutEvent).includes(event.data)) {
-        if (event.data === CheckoutEvent.ResizeFull) {
-          this.resize(CheckoutEvent.ResizeFull);
-        } else if (event.data === CheckoutEvent.ResizeReset) {
-          this.resize(CheckoutEvent.ResizeReset);
-        } else {
-          this.emit(event.data);
-        }
+  private handleMessage = (event: MessageEvent): void => {
+    if (Object.values(CheckoutEvent).includes(event.data)) {
+      if (event.data === CheckoutEvent.ResizeFull) {
+        this.resize(CheckoutEvent.ResizeFull);
+      } else if (event.data === CheckoutEvent.ResizeReset) {
+        this.resize(CheckoutEvent.ResizeReset);
+      } else {
+        this.emit(event.data);
       }
-    });
+    }
+  };
+
+  private attachEventListeners(): void {
+    window.addEventListener("message", this.handleMessage);
   }
 
   private resize(event: string): void {
@@ -149,16 +151,25 @@ export default class Checkout extends EventEmitter2 {
     }
   }
 
-  render(): void {
-    const iframe = this.createIframe();
-    const container = document.getElementById(this.containerId);
-
-    if (container == null) {
-      throw new Error(`No container with id "${this.containerId}" found`);
+  dispose(): void {
+    if (this.iframe) {
+      this.iframe.remove();
     }
 
-    container.innerHTML = "";
-    container.appendChild(iframe);
+    window.removeEventListener("message", this.handleMessage);
+
+    this.removeAllListeners();
+  }
+
+  render(): void {
+    const iframe = this.createIframe();
+
+    if (!this.container) {
+      throw new Error("No container found");
+    }
+
+    this.container.innerHTML = "";
+    this.container.appendChild(iframe);
     this.attachEventListeners();
   }
 }
