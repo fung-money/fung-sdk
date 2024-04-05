@@ -35,7 +35,7 @@ describe("@fung-sdk/checkout", () => {
       containerId: "random",
     });
     expect(() => checkout.render()).toThrowError(
-      "No container with id \"random\" found",
+      "No container found",
     );
   });
 
@@ -357,13 +357,22 @@ describe("@fung-sdk/checkout", () => {
     }).toThrow("checkoutId is required");
   });
 
-  it("should throw an error if no containerId is provided", () => {
+  it("should throw an error if no container or containerId is found", () => {
     expect(() => {
-      // @ts-expect-error Testing invalid input
       // eslint-disable-next-line no-new
       new Checkout({
         checkoutId: "abc",
       });
-    }).toThrow("containerId is required");
+    }).toThrowError("Either container or containerId is required");
+  });
+
+  it("should create a checkout object with a DOM element", () => {
+    const container = document.createElement("div");
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      container,
+    });
+
+    expect(checkout).toBeInstanceOf(Checkout);
   });
 });

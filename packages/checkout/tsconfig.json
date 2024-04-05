@@ -10,7 +10,7 @@
     "declarationMap": true,
     "allowSyntheticDefaultImports": true,
     "lib": ["ES6", "DOM"],
-    "target": "ES6",
+    "target": "es2015",
     "module": "CommonJS",
     "moduleResolution": "Node",
     "outDir": "./dist",

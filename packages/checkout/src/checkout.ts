@@ -13,7 +13,7 @@ export type Env = "production" | "sandbox" | "development" | "local";
 export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
 
-  protected containerId: string;
+  protected container: HTMLElement | null = null;
 
   protected env: Env;
 
@@ -27,6 +27,7 @@ export default class Checkout extends EventEmitter2 {
 
   constructor({
     checkoutId,
+    container,
     containerId,
     env = "production",
     url = null,
@@ -34,7 +35,8 @@ export default class Checkout extends EventEmitter2 {
     height,
   }: {
     checkoutId: string;
-    containerId: string;
+    container?: HTMLElement;
+    containerId?: string;
     env?: Env;
     url?: string | null;
     small?: boolean;
@@ -43,10 +45,10 @@ export default class Checkout extends EventEmitter2 {
     super();
 
     if (!checkoutId) throw new Error("checkoutId is required");
-    if (!containerId) throw new Error("containerId is required");
+    if (!container && !containerId) throw new Error("Either container or containerId is required");
 
     this.checkoutId = checkoutId;
-    this.containerId = containerId;
+    this.container = container || document.getElementById(containerId || "");
     this.env = env;
     this.url = url;
     this.small = small;
@@ -161,14 +163,13 @@ export default class Checkout extends EventEmitter2 {
 
   render(): void {
     const iframe = this.createIframe();
-    const container = document.getElementById(this.containerId);
 
-    if (container == null) {
-      throw new Error(`No container with id "${this.containerId}" found`);
+    if (!this.container) {
+      throw new Error("No container found");
     }
 
-    container.innerHTML = "";
-    container.appendChild(iframe);
+    this.container.innerHTML = "";
+    this.container.appendChild(iframe);
     this.attachEventListeners();
   }
 }
