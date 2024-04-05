@@ -1,5 +1,5 @@
-import assert from "assert";
 import EventEmitter2 from "eventemitter2";
+import { iframeResizer } from "iframe-resizer";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_LOCAL,
@@ -42,8 +42,8 @@ export default class Checkout extends EventEmitter2 {
   }) {
     super();
 
-    assert(checkoutId, "checkoutId is required");
-    assert(containerId, "containerId is required");
+    if (!checkoutId) throw new Error("checkoutId is required");
+    if (!containerId) throw new Error("containerId is required");
 
     this.checkoutId = checkoutId;
     this.containerId = containerId;
@@ -98,25 +98,25 @@ export default class Checkout extends EventEmitter2 {
       }
     }
 
-    import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
-      iFrameResize({ checkOrigin: false }, iframe);
-    });
+    iframeResizer({ checkOrigin: false }, iframe);
 
     return iframe;
   }
 
-  private attachEventListeners(): void {
-    window.addEventListener("message", (event) => {
-      if (Object.values(CheckoutEvent).includes(event.data)) {
-        if (event.data === CheckoutEvent.ResizeFull) {
-          this.resize(CheckoutEvent.ResizeFull);
-        } else if (event.data === CheckoutEvent.ResizeReset) {
-          this.resize(CheckoutEvent.ResizeReset);
-        } else {
-          this.emit(event.data);
-        }
+  private handleMessage = (event: MessageEvent): void => {
+    if (Object.values(CheckoutEvent).includes(event.data)) {
+      if (event.data === CheckoutEvent.ResizeFull) {
+        this.resize(CheckoutEvent.ResizeFull);
+      } else if (event.data === CheckoutEvent.ResizeReset) {
+        this.resize(CheckoutEvent.ResizeReset);
+      } else {
+        this.emit(event.data);
       }
-    });
+    }
+  };
+
+  private attachEventListeners(): void {
+    window.addEventListener("message", this.handleMessage);
   }
 
   private resize(event: string): void {
@@ -147,6 +147,16 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.left = "0";
       this.iframe.style.zIndex = "0";
     }
+  }
+
+  dispose(): void {
+    if (this.iframe) {
+      this.iframe.remove();
+    }
+
+    window.removeEventListener("message", this.handleMessage);
+
+    this.removeAllListeners();
   }
 
   render(): void {

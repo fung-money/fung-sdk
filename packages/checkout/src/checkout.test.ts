@@ -2,13 +2,11 @@ import { JSDOM } from "jsdom";
 import Checkout from "./checkout.js";
 import { CheckoutEvent } from "./config.js";
 
-jest.mock("iframe-resizer/js/iframeResizer.js", () =>
-  jest.fn().mockImplementation(() => ({
-    // whatever mock implementation or properties you want here
-    close: jest.fn(),
-    resize: jest.fn(),
-  }))
-);
+jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementation(() => ({
+  // whatever mock implementation or properties you want here
+  close: jest.fn(),
+  resize: jest.fn(),
+})));
 
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
@@ -37,7 +35,7 @@ describe("@fung-sdk/checkout", () => {
       containerId: "random",
     });
     expect(() => checkout.render()).toThrowError(
-      'No container with id "random" found'
+      "No container with id \"random\" found",
     );
   });
 
@@ -178,7 +176,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(window.addEventListener).toHaveBeenCalledWith(
       "message",
-      expect.any(Function)
+      expect.any(Function),
     );
   });
 
@@ -328,5 +326,44 @@ describe("@fung-sdk/checkout", () => {
 
     expect(iframe).not.toBeNull();
     expect(mockFn).toHaveBeenCalled();
+  });
+
+  it("should dispose of the checkout object", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    checkout.render();
+    checkout.dispose();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).toBeNull();
+
+    const mockFn = jest.fn();
+    checkout.on(CheckoutEvent.Loaded, mockFn);
+    window.postMessage(CheckoutEvent.Loaded, "*");
+
+    expect(mockFn).not.toHaveBeenCalled();
+  });
+
+  it("should throw an error if no checkoutId is provided", () => {
+    expect(() => {
+      // @ts-expect-error Testing invalid input
+      // eslint-disable-next-line no-new
+      new Checkout({
+        containerId: "xyz",
+      });
+    }).toThrow("checkoutId is required");
+  });
+
+  it("should throw an error if no containerId is provided", () => {
+    expect(() => {
+      // @ts-expect-error Testing invalid input
+      // eslint-disable-next-line no-new
+      new Checkout({
+        checkoutId: "abc",
+      });
+    }).toThrow("containerId is required");
   });
 });
