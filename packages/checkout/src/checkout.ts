@@ -1,5 +1,4 @@
 import EventEmitter2 from "eventemitter2";
-import { iframeResizer } from "iframe-resizer";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_LOCAL,
@@ -100,8 +99,9 @@ export default class Checkout extends EventEmitter2 {
       }
     }
 
-    iframeResizer({ checkOrigin: false }, iframe);
-
+    import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
+      iFrameResize({ checkOrigin: false }, iframe);
+    });
     return iframe;
   }
 
