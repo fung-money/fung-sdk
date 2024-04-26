@@ -460,4 +460,18 @@ describe("@fung-sdk/checkout", () => {
 
     expect(postMessageSpy).not.toHaveBeenCalled();
   });
+
+  it("should return the wallets URL if walletsOnly is true", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      walletsOnly: true,
+    });
+
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("wallets");
+  });
 });
