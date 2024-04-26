@@ -24,6 +24,8 @@ export default class Checkout extends EventEmitter2 {
 
   protected height: string | undefined = undefined;
 
+  protected formOnly: boolean = false;
+
   constructor({
     checkoutId,
     container,
@@ -32,6 +34,7 @@ export default class Checkout extends EventEmitter2 {
     url = null,
     small = false,
     height,
+    formOnly = false
   }: {
     checkoutId: string;
     container?: HTMLElement;
@@ -40,6 +43,7 @@ export default class Checkout extends EventEmitter2 {
     url?: string | null;
     small?: boolean;
     height?: string;
+    formOnly?: boolean
   }) {
     super();
 
@@ -52,10 +56,11 @@ export default class Checkout extends EventEmitter2 {
     this.url = url;
     this.small = small;
     this.height = height;
+    this.formOnly = formOnly;
   }
 
   private getCheckoutUrl() {
-    if (this.url) return `${this.url}?style=embedded`;
+    if (this.url) return `${this.url}?style=embedded` + (this.formOnly ? "&formOnly=true" : "");
 
     let baseUrl;
     switch (this.env) {
@@ -75,7 +80,7 @@ export default class Checkout extends EventEmitter2 {
       // No default, as we assign default in the constructor
     }
 
-    return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded`;
+    return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded` + (this.formOnly ? "&formOnly=true" : "");
   }
 
   private createIframe(): HTMLIFrameElement {
@@ -171,5 +176,15 @@ export default class Checkout extends EventEmitter2 {
     this.container.innerHTML = "";
     this.container.appendChild(iframe);
     this.attachEventListeners();
+  }
+
+  isReadyToSubmit(): boolean {
+    return !!this.iframe;
+  }
+
+  submit(): void {
+    if (this.iframe) {
+      this.iframe.contentWindow?.postMessage("fung-submit", "*");
+    }
   }
 }
