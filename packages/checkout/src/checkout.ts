@@ -34,7 +34,7 @@ export default class Checkout extends EventEmitter2 {
     url = null,
     small = false,
     height,
-    formOnly = false
+    formOnly = false,
   }: {
     checkoutId: string;
     container?: HTMLElement;
@@ -60,7 +60,7 @@ export default class Checkout extends EventEmitter2 {
   }
 
   private getCheckoutUrl() {
-    if (this.url) return `${this.url}?style=embedded` + (this.formOnly ? "&formOnly=true" : "");
+    if (this.url) return `${this.url}?style=embedded${this.formOnly ? "&formOnly=true" : ""}`;
 
     let baseUrl;
     switch (this.env) {
@@ -80,7 +80,7 @@ export default class Checkout extends EventEmitter2 {
       // No default, as we assign default in the constructor
     }
 
-    return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded` + (this.formOnly ? "&formOnly=true" : "");
+    return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded${this.formOnly ? "&formOnly=true" : ""}`;
   }
 
   private createIframe(): HTMLIFrameElement {

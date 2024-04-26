@@ -103,7 +103,6 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.src).toContain("formOnly=true");
   });
 
-
   it("should render a checkout iframe for sandbox", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
@@ -442,7 +441,7 @@ describe("@fung-sdk/checkout", () => {
     checkout.render();
 
     const iframe = document.querySelector("iframe");
-    const postMessageSpy = jest.spyOn(iframe?.contentWindow as any, 'postMessage');
+    const postMessageSpy = jest.spyOn(iframe?.contentWindow as any, "postMessage");
 
     checkout.submit();
 
@@ -455,11 +454,10 @@ describe("@fung-sdk/checkout", () => {
       containerId: "xyz",
     });
 
-    const postMessageSpy = jest.spyOn(window, 'postMessage');
+    const postMessageSpy = jest.spyOn(window, "postMessage");
 
     checkout.submit();
 
     expect(postMessageSpy).not.toHaveBeenCalled();
   });
-
 });
