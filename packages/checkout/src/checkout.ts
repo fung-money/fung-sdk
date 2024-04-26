@@ -26,6 +26,8 @@ export default class Checkout extends EventEmitter2 {
 
   protected formOnly: boolean = false;
 
+  protected walletsOnly: boolean = false;
+
   constructor({
     checkoutId,
     container,
@@ -35,6 +37,7 @@ export default class Checkout extends EventEmitter2 {
     small = false,
     height,
     formOnly = false,
+    walletsOnly = false,
   }: {
     checkoutId: string;
     container?: HTMLElement;
@@ -44,6 +47,7 @@ export default class Checkout extends EventEmitter2 {
     small?: boolean;
     height?: string;
     formOnly?: boolean
+    walletsOnly?: boolean;
   }) {
     super();
 
@@ -57,10 +61,12 @@ export default class Checkout extends EventEmitter2 {
     this.small = small;
     this.height = height;
     this.formOnly = formOnly;
+    this.walletsOnly = walletsOnly;
+
+    if (this.walletsOnly) this.small = true;
   }
 
   private getCheckoutUrl() {
-    if (this.url) return `${this.url}?style=embedded${this.formOnly ? "&formOnly=true" : ""}`;
 
     let baseUrl;
     switch (this.env) {
@@ -77,8 +83,13 @@ export default class Checkout extends EventEmitter2 {
         baseUrl = CHECKOUT_ENDPOINT_LOCAL;
         break;
       default:
-      // No default, as we assign default in the constructor
+        // No default, as we assign default in the constructor
     }
+
+    if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+
+    if (this.url) return `${this.url}?style=embedded${this.formOnly ? "&formOnly=true" : ""}`;
+
 
     return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded${this.formOnly ? "&formOnly=true" : ""}`;
   }
