@@ -90,6 +90,19 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.style.minHeight).toEqual("100px");
   });
 
+  it("should set formOnly=true when formOnly is true", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      formOnly: true,
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("formOnly=true");
+  });
+
   it("should render a checkout iframe for sandbox", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
@@ -126,7 +139,7 @@ describe("@fung-sdk/checkout", () => {
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
-    expect(iframe?.src).toContain("http://localhost:3000");
+    expect(iframe?.src).toContain("http://localhost:4200");
   });
 
   it("should dispatch a CHECKOUT_LOADED event", async () => {
@@ -162,6 +175,21 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain(customUrl); // iframe src should contain the custom URL
+  });
+
+  it("should add formOnly=true to the custom url", () => {
+    const customUrl = "https://custom.url/checkout";
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      url: customUrl,
+      formOnly: true,
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("formOnly=true"); // iframe src should contain the custom URL
   });
 
   it("should attach event listeners on render", () => {
@@ -374,5 +402,76 @@ describe("@fung-sdk/checkout", () => {
     });
 
     expect(checkout).toBeInstanceOf(Checkout);
+  });
+
+  it("should return true if iframe is ready to submit", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    checkout.render();
+
+    expect(checkout.isReadyToSubmit()).toBe(true);
+  });
+
+  it("should return true if iframe is ready to submit", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    checkout.render();
+
+    expect(checkout.isReadyToSubmit()).toBe(true);
+  });
+
+  it("should return false if iframe is not ready to submit", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    expect(checkout.isReadyToSubmit()).toBe(false);
+  });
+
+  it("should post a message to the iframe when submit is called", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    const postMessageSpy = jest.spyOn(iframe?.contentWindow as any, "postMessage");
+
+    checkout.submit();
+
+    expect(postMessageSpy).toHaveBeenCalledWith("fung-submit", "*");
+  });
+
+  it("should not post a message if iframe is not ready when submit is called", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    const postMessageSpy = jest.spyOn(window, "postMessage");
+
+    checkout.submit();
+
+    expect(postMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it("should return the wallets URL if walletsOnly is true", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      walletsOnly: true,
+    });
+
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("wallets");
   });
 });

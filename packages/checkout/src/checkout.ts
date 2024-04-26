@@ -24,6 +24,10 @@ export default class Checkout extends EventEmitter2 {
 
   protected height: string | undefined = undefined;
 
+  protected formOnly: boolean = false;
+
+  protected walletsOnly: boolean = false;
+
   constructor({
     checkoutId,
     container,
@@ -32,6 +36,8 @@ export default class Checkout extends EventEmitter2 {
     url = null,
     small = false,
     height,
+    formOnly = false,
+    walletsOnly = false,
   }: {
     checkoutId: string;
     container?: HTMLElement;
@@ -40,6 +46,8 @@ export default class Checkout extends EventEmitter2 {
     url?: string | null;
     small?: boolean;
     height?: string;
+    formOnly?: boolean
+    walletsOnly?: boolean;
   }) {
     super();
 
@@ -52,10 +60,13 @@ export default class Checkout extends EventEmitter2 {
     this.url = url;
     this.small = small;
     this.height = height;
+    this.formOnly = formOnly;
+    this.walletsOnly = walletsOnly;
+
+    if (this.walletsOnly) this.small = true;
   }
 
   private getCheckoutUrl() {
-    if (this.url) return `${this.url}?style=embedded`;
 
     let baseUrl;
     switch (this.env) {
@@ -72,10 +83,15 @@ export default class Checkout extends EventEmitter2 {
         baseUrl = CHECKOUT_ENDPOINT_LOCAL;
         break;
       default:
-      // No default, as we assign default in the constructor
+        // No default, as we assign default in the constructor
     }
 
-    return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded`;
+    if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+
+    if (this.url) return `${this.url}?style=embedded${this.formOnly ? "&formOnly=true" : ""}`;
+
+
+    return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded${this.formOnly ? "&formOnly=true" : ""}`;
   }
 
   private createIframe(): HTMLIFrameElement {
@@ -171,5 +187,15 @@ export default class Checkout extends EventEmitter2 {
     this.container.innerHTML = "";
     this.container.appendChild(iframe);
     this.attachEventListeners();
+  }
+
+  isReadyToSubmit(): boolean {
+    return !!this.iframe;
+  }
+
+  submit(): void {
+    if (this.iframe) {
+      this.iframe.contentWindow?.postMessage("fung-submit", "*");
+    }
   }
 }
