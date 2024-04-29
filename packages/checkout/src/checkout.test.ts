@@ -474,4 +474,46 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain("wallets");
   });
+
+  it("should return correct query parameters", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      formOnly: true,
+      language: "fr",
+    });
+
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("?style=embedded&language=fr&formOnly=true");
+  });
+
+  it("should return correct language property", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      language: "fr",
+    });
+
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("language=fr");
+  });
+
+  it("should set en as the default language property", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("language=en");
+  })
 });

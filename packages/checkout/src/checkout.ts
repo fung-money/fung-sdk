@@ -28,6 +28,8 @@ export default class Checkout extends EventEmitter2 {
 
   protected walletsOnly: boolean = false;
 
+  protected language: string = "en";
+
   constructor({
     checkoutId,
     container,
@@ -38,6 +40,7 @@ export default class Checkout extends EventEmitter2 {
     height,
     formOnly = false,
     walletsOnly = false,
+    language = "en",
   }: {
     checkoutId: string;
     container?: HTMLElement;
@@ -48,6 +51,7 @@ export default class Checkout extends EventEmitter2 {
     height?: string;
     formOnly?: boolean
     walletsOnly?: boolean;
+    language?: string;
   }) {
     super();
 
@@ -62,12 +66,22 @@ export default class Checkout extends EventEmitter2 {
     this.height = height;
     this.formOnly = formOnly;
     this.walletsOnly = walletsOnly;
+    this.language = language;
 
     if (this.walletsOnly) this.small = true;
   }
 
-  private getCheckoutUrl() {
+  private getQueryParameters(): string {
+    const params = new URLSearchParams();
+    params.append("style", "embedded");
+    params.append("language", this.language);
 
+    if (this.formOnly) params.append("formOnly", "true");
+
+    return `?${params.toString()}`;
+  }
+
+  private getCheckoutUrl() {
     let baseUrl;
     switch (this.env) {
       case "production":
@@ -87,11 +101,9 @@ export default class Checkout extends EventEmitter2 {
     }
 
     if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+    if (this.url) return `${this.url}${this.getQueryParameters()}`;
 
-    if (this.url) return `${this.url}?style=embedded${this.formOnly ? "&formOnly=true" : ""}`;
-
-
-    return `${baseUrl}/checkout/${this.checkoutId}/view?style=embedded${this.formOnly ? "&formOnly=true" : ""}`;
+    return `${baseUrl}/checkout/${this.checkoutId}/view${this.getQueryParameters()}`;
   }
 
   private createIframe(): HTMLIFrameElement {
