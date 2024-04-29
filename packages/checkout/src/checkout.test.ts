@@ -474,4 +474,29 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain("wallets");
   });
+
+  it("should return correct query parameters", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      formOnly: true,
+      language: 'fr',
+    });
+
+    // @ts-ignore: We are testing a private method
+    const queryParams = checkout.getQueryParameters();
+
+    expect(queryParams).toBe("?style=embedded&language=fr&formOnly=true");
+  });
+
+  it("should return correct language property", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      language: 'fr',
+    });
+
+    // @ts-ignore: We are testing a private property
+    expect(checkout.language).toBe('fr');
+  });
 });
