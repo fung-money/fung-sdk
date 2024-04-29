@@ -503,4 +503,17 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain("language=fr");
   });
+
+  it("should set en as the default language property", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("language=en");
+  })
 });
