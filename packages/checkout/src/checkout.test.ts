@@ -483,10 +483,11 @@ describe("@fung-sdk/checkout", () => {
       language: "fr",
     });
 
-    // @ts-ignore: We are testing a private method
-    const queryParams = checkout.getQueryParameters();
+    checkout.render();
 
-    expect(queryParams).toBe("?style=embedded&language=fr&formOnly=true");
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("?style=embedded&language=fr&formOnly=true");
   });
 
   it("should return correct language property", () => {
@@ -496,7 +497,10 @@ describe("@fung-sdk/checkout", () => {
       language: "fr",
     });
 
-    // @ts-ignore: We are testing a private property
-    expect(checkout.language).toBe("fr");
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("language=fr");
   });
 });
