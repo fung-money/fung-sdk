@@ -28,7 +28,7 @@ export default class Checkout extends EventEmitter2 {
 
   protected walletsOnly: boolean = false;
 
-  protected language: string = 'en';
+  protected language: string = "en";
 
   constructor({
     checkoutId,
@@ -40,7 +40,7 @@ export default class Checkout extends EventEmitter2 {
     height,
     formOnly = false,
     walletsOnly = false,
-    language = 'en',
+    language = "en",
   }: {
     checkoutId: string;
     container?: HTMLElement;
@@ -73,16 +73,15 @@ export default class Checkout extends EventEmitter2 {
 
   private getQueryParameters(): string {
     const params = new URLSearchParams();
-    params.append('style', 'embedded');
-    params.append('language', this.language);
+    params.append("style", "embedded");
+    params.append("language", this.language);
 
-    if (this.formOnly) params.append('formOnly', 'true');
+    if (this.formOnly) params.append("formOnly", "true");
 
     return `?${params.toString()}`;
   }
 
   private getCheckoutUrl() {
-
     let baseUrl;
     switch (this.env) {
       case "production":

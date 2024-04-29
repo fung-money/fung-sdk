@@ -480,7 +480,7 @@ describe("@fung-sdk/checkout", () => {
       checkoutId: "abc",
       containerId: "xyz",
       formOnly: true,
-      language: 'fr',
+      language: "fr",
     });
 
     // @ts-ignore: We are testing a private method
@@ -493,10 +493,10 @@ describe("@fung-sdk/checkout", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
-      language: 'fr',
+      language: "fr",
     });
 
     // @ts-ignore: We are testing a private property
-    expect(checkout.language).toBe('fr');
+    expect(checkout.language).toBe("fr");
   });
 });
