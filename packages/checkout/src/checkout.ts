@@ -73,6 +73,13 @@ export default class Checkout extends EventEmitter2 {
 
   private getQueryParameters(): string {
     const params = new URLSearchParams();
+    if (this.url) {
+      const url = new URL(this.url);
+      url.searchParams.forEach((value, key) => {
+        params.append(key, value);
+      });
+    }
+
     params.append("style", "embedded");
     params.append("language", this.language);
 

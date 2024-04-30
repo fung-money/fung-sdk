@@ -490,6 +490,22 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.src).toContain("?style=embedded&language=fr&formOnly=true");
   });
 
+  it("should retain previous query parameters", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      url: "https://custom.url/checkout?custom=param",
+      formOnly: true,
+      language: "fr",
+    });
+
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src).toContain("custom=param&style=embedded&language=fr&formOnly=true");
+  })
+
   it("should return correct language property", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
