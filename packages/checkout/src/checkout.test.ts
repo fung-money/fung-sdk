@@ -100,10 +100,10 @@ describe("@fung-sdk/checkout", () => {
 
     checkout.setTheme(theme);
 
-    expect(postMessageSpy).toHaveBeenCalledWith({
-      theme,
+    expect(postMessageSpy).toHaveBeenCalledWith(JSON.stringify({
       type: "checkout:theme",
-    }, "*");
+      theme
+    }), "*");
   });
 
   it("should optionally set height for small=true", () => {
