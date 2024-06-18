@@ -76,6 +76,36 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.src).toContain("https://pay.fungpayments.com");
   });
 
+  it("should render a checkout iframe with a custom theme", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      env: "production",
+    });
+
+    const theme = {
+      accentColor: "#faff43",
+      accentColorContrast: "#0e0e03",
+      borderRadius: "4px",
+      brandColor: "#0000000",
+      brandColorContrast: "#ffffff",
+      fontFamily: "Inter",
+      logoUrl: "",
+    };
+
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    const postMessageSpy = jest.spyOn(iframe?.contentWindow as any, "postMessage");
+
+    checkout.setTheme(theme);
+
+    expect(postMessageSpy).toHaveBeenCalledWith({
+      theme,
+      type: "checkout:theme",
+    }, "*");
+  });
+
   it("should optionally set height for small=true", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
@@ -504,7 +534,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain("custom=param&style=embedded&language=fr&formOnly=true");
-  })
+  });
 
   it("should return correct language property", () => {
     const checkout = new Checkout({
@@ -531,5 +561,5 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain("language=en");
-  })
+  });
 });

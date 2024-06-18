@@ -15,7 +15,8 @@ interface ITheme {
   borderRadius: string;
   brandColor: string;
   brandColorContrast: string;
-  fontFamily: "Inter" | "Courier New" | "Georgia" | "Helvetica" | "Montserrat" | "Roboto" | "Poppins";
+  // "Inter" | "Courier New" | "Georgia" | "Helvetica" | "Montserrat" | "Roboto" | "Poppins";
+  fontFamily: string;
   logoUrl: string;
 }
 
@@ -212,15 +213,11 @@ export default class Checkout extends EventEmitter2 {
     this.removeAllListeners();
   }
 
-  render(theme?: ITheme): void {
+  render(): void {
     const iframe = this.createIframe();
 
     if (!this.container) {
       throw new Error("No container found");
-    }
-
-    if (this.iframe && theme) {
-      this.iframe.contentWindow?.postMessage({ type: CheckoutEvent.Theme, theme }, "*");
     }
 
     this.container.innerHTML = "";
@@ -235,6 +232,12 @@ export default class Checkout extends EventEmitter2 {
   submit(): void {
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage("fung-submit", "*");
+    }
+  }
+
+  setTheme(theme: ITheme): void {
+    if (this.iframe) {
+      this.iframe.contentWindow?.postMessage({ type: CheckoutEvent.Theme, theme }, "*");
     }
   }
 }
