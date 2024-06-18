@@ -9,10 +9,9 @@ import {
 
 export type Env = "production" | "sandbox" | "development" | "local";
 
-interface Theme {
+interface ITheme {
   accentColor: string;
   accentColorContrast: string;
-  backgroundColor: string;
   borderRadius: string;
   brandColor: string;
   brandColorContrast: string;
@@ -213,7 +212,7 @@ export default class Checkout extends EventEmitter2 {
     this.removeAllListeners();
   }
 
-  render(theme?: Theme): void {
+  render(theme?: ITheme): void {
     const iframe = this.createIframe();
 
     if (!this.container) {
