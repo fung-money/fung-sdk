@@ -237,7 +237,7 @@ export default class Checkout extends EventEmitter2 {
 
   setTheme(theme: ITheme): void {
     if (this.iframe) {
-      this.iframe.contentWindow?.postMessage({ type: CheckoutEvent.Theme, theme }, "*");
+      this.iframe.contentWindow?.postMessage(JSON.stringify({ type: CheckoutEvent.Theme, theme }), "*");
     }
   }
 }
