@@ -219,7 +219,7 @@ export default class Checkout extends EventEmitter2 {
       throw new Error("No container found");
     }
 
-    if (this.iframe) {
+    if (this.iframe && theme) {
       this.iframe.contentWindow?.postMessage({ type: CheckoutEvent.Theme, theme }, "*");
     }
 
