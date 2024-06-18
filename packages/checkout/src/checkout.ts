@@ -9,6 +9,17 @@ import {
 
 export type Env = "production" | "sandbox" | "development" | "local";
 
+interface Theme {
+  accentColor: string;
+  accentColorContrast: string;
+  backgroundColor: string;
+  borderRadius: string;
+  brandColor: string;
+  brandColorContrast: string;
+  fontFamily: "Inter" | "Courier New" | "Georgia" | "Helvetica" | "Montserrat" | "Roboto" | "Poppins";
+  logoUrl: string;
+}
+
 export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
 
@@ -30,6 +41,8 @@ export default class Checkout extends EventEmitter2 {
 
   protected language: string = "en";
 
+  protected darkMode: boolean = false;
+
   constructor({
     checkoutId,
     container,
@@ -41,6 +54,7 @@ export default class Checkout extends EventEmitter2 {
     formOnly = false,
     walletsOnly = false,
     language = "en",
+    darkMode = false,
   }: {
     checkoutId: string;
     container?: HTMLElement;
@@ -52,6 +66,7 @@ export default class Checkout extends EventEmitter2 {
     formOnly?: boolean
     walletsOnly?: boolean;
     language?: string;
+    darkMode?: boolean;
   }) {
     super();
 
@@ -67,6 +82,7 @@ export default class Checkout extends EventEmitter2 {
     this.formOnly = formOnly;
     this.walletsOnly = walletsOnly;
     this.language = language;
+    this.darkMode = darkMode;
 
     if (this.walletsOnly) this.small = true;
   }
@@ -83,6 +99,7 @@ export default class Checkout extends EventEmitter2 {
     params.append("style", "embedded");
     params.append("language", this.language);
 
+    if (this.darkMode) params.append("dark", "true");
     if (this.formOnly) params.append("formOnly", "true");
 
     return `?${params.toString()}`;
@@ -196,11 +213,15 @@ export default class Checkout extends EventEmitter2 {
     this.removeAllListeners();
   }
 
-  render(): void {
+  render(theme?: Theme): void {
     const iframe = this.createIframe();
 
     if (!this.container) {
       throw new Error("No container found");
+    }
+
+    if (this.iframe) {
+      this.iframe.contentWindow?.postMessage({ type: CheckoutEvent.Theme, theme }, "*");
     }
 
     this.container.innerHTML = "";

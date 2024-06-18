@@ -11,4 +11,5 @@ export enum CheckoutEvent {
   Failed = "checkout:failed",
   ResizeFull = "resize:full",
   ResizeReset = "resize:reset",
+  Theme = "checkout:theme",
 }
