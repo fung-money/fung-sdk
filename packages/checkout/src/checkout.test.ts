@@ -102,7 +102,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(postMessageSpy).toHaveBeenCalledWith(JSON.stringify({
       type: "checkout:theme",
-      theme
+      theme,
     }), "*");
   });
 
@@ -268,6 +268,31 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.style.minWidth).toBe("");
     expect(iframe?.style.minHeight).toBe("100px");
+  });
+
+  it("should open a new window if the event is of type IdealRedirect", (done) => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    const openSpy = jest.spyOn(window.parent, "open").mockImplementation(() => null);
+
+    checkout.render();
+    const iframe = document.querySelector("iframe");
+    const event = {
+      type: CheckoutEvent.IdealRedirect,
+      url: "http://test.com",
+    };
+
+    iframe?.contentWindow?.parent.postMessage(event, "*");
+
+    setTimeout(() => {
+      expect(openSpy).toHaveBeenCalledWith("http://test.com", "_blank");
+
+      openSpy.mockRestore();
+      done();
+    }, 0);
   });
 
   it("should resize the iframe to full screen on CHECKOUT_RESIZE_FULL event when small", () => {
