@@ -12,4 +12,5 @@ export enum CheckoutEvent {
   ResizeFull = "resize:full",
   ResizeReset = "resize:reset",
   Theme = "checkout:theme",
+  IdealRedirect = "checkout:ideal-redirect",
 }
