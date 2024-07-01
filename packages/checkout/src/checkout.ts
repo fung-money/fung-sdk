@@ -158,7 +158,8 @@ export default class Checkout extends EventEmitter2 {
   }
 
   private handleMessage = (event: MessageEvent): void => {
-    if (Object.values(CheckoutEvent).includes(event.data)) {
+    if (Object.values(CheckoutEvent).includes(event.data)
+        || Object.values(CheckoutEvent).includes(event.data.type)) {
       if (event.data === CheckoutEvent.ResizeFull) {
         this.resize(CheckoutEvent.ResizeFull);
       } else if (event.data === CheckoutEvent.ResizeReset) {
