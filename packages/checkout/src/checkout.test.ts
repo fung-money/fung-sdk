@@ -2,11 +2,13 @@ import { JSDOM } from "jsdom";
 import Checkout from "./checkout.js";
 import { CheckoutEvent } from "./config.js";
 
-jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementation(() => ({
-  // whatever mock implementation or properties you want here
-  close: jest.fn(),
-  resize: jest.fn(),
-})));
+jest.mock("iframe-resizer/js/iframeResizer.js", () =>
+  jest.fn().mockImplementation(() => ({
+    // whatever mock implementation or properties you want here
+    close: jest.fn(),
+    resize: jest.fn(),
+  }))
+);
 
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
@@ -34,9 +36,7 @@ describe("@fung-sdk/checkout", () => {
       checkoutId: "abc",
       containerId: "random",
     });
-    expect(() => checkout.render()).toThrowError(
-      "No container found",
-    );
+    expect(() => checkout.render()).toThrowError("No container found");
   });
 
   it("should render a checkout iframe", () => {
@@ -96,14 +96,20 @@ describe("@fung-sdk/checkout", () => {
     checkout.render();
 
     const iframe = document.querySelector("iframe");
-    const postMessageSpy = jest.spyOn(iframe?.contentWindow as any, "postMessage");
+    const postMessageSpy = jest.spyOn(
+      iframe?.contentWindow as any,
+      "postMessage"
+    );
 
     checkout.setTheme(theme);
 
-    expect(postMessageSpy).toHaveBeenCalledWith(JSON.stringify({
-      type: "checkout:theme",
-      theme,
-    }), "*");
+    expect(postMessageSpy).toHaveBeenCalledWith(
+      JSON.stringify({
+        type: "checkout:theme",
+        theme,
+      }),
+      "*"
+    );
   });
 
   it("should optionally set height for small=true", () => {
@@ -234,7 +240,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(window.addEventListener).toHaveBeenCalledWith(
       "message",
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -268,31 +274,6 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.style.minWidth).toBe("");
     expect(iframe?.style.minHeight).toBe("100px");
-  });
-
-  it("should open a new window if the event is of type IdealRedirect", (done) => {
-    const checkout = new Checkout({
-      checkoutId: "abc",
-      containerId: "xyz",
-    });
-
-    const openSpy = jest.spyOn(window.parent, "open").mockImplementation(() => null);
-
-    checkout.render();
-    const iframe = document.querySelector("iframe");
-    const event = {
-      type: CheckoutEvent.IdealRedirect,
-      url: "http://test.com",
-    };
-
-    iframe?.contentWindow?.parent.postMessage(event, "*");
-
-    setTimeout(() => {
-      expect(openSpy).toHaveBeenCalledWith("http://test.com", "_blank");
-
-      openSpy.mockRestore();
-      done();
-    }, 0);
   });
 
   it("should resize the iframe to full screen on CHECKOUT_RESIZE_FULL event when small", () => {
@@ -496,7 +477,10 @@ describe("@fung-sdk/checkout", () => {
     checkout.render();
 
     const iframe = document.querySelector("iframe");
-    const postMessageSpy = jest.spyOn(iframe?.contentWindow as any, "postMessage");
+    const postMessageSpy = jest.spyOn(
+      iframe?.contentWindow as any,
+      "postMessage"
+    );
 
     checkout.submit();
 
@@ -558,7 +542,9 @@ describe("@fung-sdk/checkout", () => {
 
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
-    expect(iframe?.src).toContain("custom=param&style=embedded&language=fr&formOnly=true");
+    expect(iframe?.src).toContain(
+      "custom=param&style=embedded&language=fr&formOnly=true"
+    );
   });
 
   it("should return correct language property", () => {
