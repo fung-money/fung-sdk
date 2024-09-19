@@ -76,8 +76,7 @@ export default class Checkout extends EventEmitter2 {
     super();
 
     if (!checkoutId) throw new Error("checkoutId is required");
-    if (!container && !containerId)
-      throw new Error("Either container or containerId is required");
+    if (!container && !containerId) throw new Error("Either container or containerId is required");
 
     this.checkoutId = checkoutId;
     this.container = container || document.getElementById(containerId || "");
@@ -130,8 +129,7 @@ export default class Checkout extends EventEmitter2 {
       // No default, as we assign default in the constructor
     }
 
-    if (this.walletsOnly)
-      return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+    if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
     if (this.url) return `${this.url}${this.getQueryParameters()}`;
 
     return `${baseUrl}/checkout/${
@@ -149,7 +147,7 @@ export default class Checkout extends EventEmitter2 {
     iframe.allow = "payment *";
     iframe.setAttribute(
       "sandbox",
-      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
+      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin",
     );
 
     if (!this.small) {
@@ -172,8 +170,8 @@ export default class Checkout extends EventEmitter2 {
 
   private handleMessage = (event: MessageEvent): void => {
     if (
-      Object.values(CheckoutEvent).includes(event.data) ||
-      Object.values(CheckoutEvent).includes(event.data.type)
+      Object.values(CheckoutEvent).includes(event.data)
+      || Object.values(CheckoutEvent).includes(event.data.type)
     ) {
       if (event.data === CheckoutEvent.ResizeFull) {
         this.resize(CheckoutEvent.ResizeFull);
@@ -182,8 +180,8 @@ export default class Checkout extends EventEmitter2 {
       } else if (event.data.type === CheckoutEvent.PaymentMethodSelected) {
         this.paymentMethod = event.data.paymentMethod;
       } else if (
-        event.data.type === CheckoutEvent.IdealRedirect &&
-        this.windowProxy?.location
+        event.data.type === CheckoutEvent.IdealRedirect
+        && this.windowProxy?.location
       ) {
         const sanitizedUrl = DOMPurify.sanitize(event.data.url);
         this.windowProxy.location = sanitizedUrl;
@@ -255,7 +253,7 @@ export default class Checkout extends EventEmitter2 {
 
   submit(): void {
     if (this.paymentMethod === "ideal") {
-      this.windowProxy = window.parent.open("", "_blank");
+      this.windowProxy = window.parent.open(`https://sbx.pay.fungpayments.com/processing?language=${this.language}`, "_blank");
     }
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage("fung-submit", "*");
@@ -266,7 +264,7 @@ export default class Checkout extends EventEmitter2 {
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage(
         JSON.stringify({ type: CheckoutEvent.Theme, theme }),
-        "*"
+        "*",
       );
     }
   }
