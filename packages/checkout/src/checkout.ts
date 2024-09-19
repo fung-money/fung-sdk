@@ -138,6 +138,7 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
     iframe.allow = "payment *";
+    iframe.setAttribute("sandbox", "allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts");
 
     if (!this.small) {
       iframe.style.minWidth = "400px";
@@ -164,6 +165,8 @@ export default class Checkout extends EventEmitter2 {
         this.resize(CheckoutEvent.ResizeFull);
       } else if (event.data === CheckoutEvent.ResizeReset) {
         this.resize(CheckoutEvent.ResizeReset);
+      } else if (event.data.type === CheckoutEvent.IdealRedirect) {
+        window.parent.open(event.data.url, "_blank");
       } else {
         this.emit(event.data);
       }
