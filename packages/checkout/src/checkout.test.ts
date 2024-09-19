@@ -2,11 +2,13 @@ import { JSDOM } from "jsdom";
 import Checkout from "./checkout.js";
 import { CheckoutEvent } from "./config.js";
 
-jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementation(() => ({
-  // whatever mock implementation or properties you want here
-  close: jest.fn(),
-  resize: jest.fn(),
-})));
+jest.mock("iframe-resizer/js/iframeResizer.js", () =>
+  jest.fn().mockImplementation(() => ({
+    // whatever mock implementation or properties you want here
+    close: jest.fn(),
+    resize: jest.fn(),
+  }))
+);
 
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
@@ -96,7 +98,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     const postMessageSpy = jest.spyOn(
       iframe?.contentWindow as any,
-      "postMessage",
+      "postMessage"
     );
 
     checkout.setTheme(theme);
@@ -106,7 +108,7 @@ describe("@fung-sdk/checkout", () => {
         type: "checkout:theme",
         theme,
       }),
-      "*",
+      "*"
     );
   });
 
@@ -238,7 +240,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(window.addEventListener).toHaveBeenCalledWith(
       "message",
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -477,15 +479,12 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     const postMessageSpy = jest.spyOn(
       iframe?.contentWindow as any,
-      "postMessage",
+      "postMessage"
     );
-
-    const windowProxy = jest.spyOn(window.parent, "open");
 
     checkout.submit();
 
     expect(postMessageSpy).toHaveBeenCalledWith("fung-submit", "*");
-    expect(windowProxy).toHaveBeenCalledTimes(1);
   });
 
   it("should not post a message if iframe is not ready when submit is called", () => {
@@ -544,7 +543,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain(
-      "custom=param&style=embedded&language=fr&formOnly=true",
+      "custom=param&style=embedded&language=fr&formOnly=true"
     );
   });
 
@@ -584,15 +583,23 @@ describe("@fung-sdk/checkout", () => {
 
     const windowProxy = jest.spyOn(window.parent, "open");
 
+    const idealSelectedEvent = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.PaymentMethodSelected,
+        paymentMethod: "ideal",
+      },
+    });
+    window.dispatchEvent(idealSelectedEvent);
+
     const url = "https://example.com/";
-    const event = new window.MessageEvent("message", {
+    const idealRedirectEvent = new window.MessageEvent("message", {
       data: {
         type: CheckoutEvent.IdealRedirect,
         url,
       },
     });
 
-    window.dispatchEvent(event);
+    window.dispatchEvent(idealRedirectEvent);
 
     checkout.submit();
 

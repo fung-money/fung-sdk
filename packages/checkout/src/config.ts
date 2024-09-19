@@ -13,4 +13,5 @@ export enum CheckoutEvent {
   ResizeReset = "resize:reset",
   Theme = "checkout:theme",
   IdealRedirect = "checkout:ideal-redirect",
+  PaymentMethodSelected = "checkout:payment-method-selected",
 }

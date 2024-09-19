@@ -46,6 +46,8 @@ export default class Checkout extends EventEmitter2 {
 
   protected windowProxy: WindowProxy | null = null;
 
+  paymentMethod: string | undefined;
+
   constructor({
     checkoutId,
     container,
@@ -66,7 +68,7 @@ export default class Checkout extends EventEmitter2 {
     url?: string | null;
     small?: boolean;
     height?: string;
-    formOnly?: boolean
+    formOnly?: boolean;
     walletsOnly?: boolean;
     language?: string;
     darkMode?: boolean;
@@ -74,7 +76,8 @@ export default class Checkout extends EventEmitter2 {
     super();
 
     if (!checkoutId) throw new Error("checkoutId is required");
-    if (!container && !containerId) throw new Error("Either container or containerId is required");
+    if (!container && !containerId)
+      throw new Error("Either container or containerId is required");
 
     this.checkoutId = checkoutId;
     this.container = container || document.getElementById(containerId || "");
@@ -124,13 +127,16 @@ export default class Checkout extends EventEmitter2 {
         baseUrl = CHECKOUT_ENDPOINT_LOCAL;
         break;
       default:
-        // No default, as we assign default in the constructor
+      // No default, as we assign default in the constructor
     }
 
-    if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+    if (this.walletsOnly)
+      return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
     if (this.url) return `${this.url}${this.getQueryParameters()}`;
 
-    return `${baseUrl}/checkout/${this.checkoutId}/view${this.getQueryParameters()}`;
+    return `${baseUrl}/checkout/${
+      this.checkoutId
+    }/view${this.getQueryParameters()}`;
   }
 
   private createIframe(): HTMLIFrameElement {
@@ -141,7 +147,10 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
     iframe.allow = "payment *";
-    iframe.setAttribute("sandbox", "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin");
+    iframe.setAttribute(
+      "sandbox",
+      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
+    );
 
     if (!this.small) {
       iframe.style.minWidth = "400px";
@@ -162,13 +171,20 @@ export default class Checkout extends EventEmitter2 {
   }
 
   private handleMessage = (event: MessageEvent): void => {
-    if (Object.values(CheckoutEvent).includes(event.data)
-        || Object.values(CheckoutEvent).includes(event.data.type)) {
+    if (
+      Object.values(CheckoutEvent).includes(event.data) ||
+      Object.values(CheckoutEvent).includes(event.data.type)
+    ) {
       if (event.data === CheckoutEvent.ResizeFull) {
         this.resize(CheckoutEvent.ResizeFull);
       } else if (event.data === CheckoutEvent.ResizeReset) {
         this.resize(CheckoutEvent.ResizeReset);
-      } else if (event.data.type === CheckoutEvent.IdealRedirect && this.windowProxy?.location) {
+      } else if (event.data.type === CheckoutEvent.PaymentMethodSelected) {
+        this.paymentMethod = event.data.paymentMethod;
+      } else if (
+        event.data.type === CheckoutEvent.IdealRedirect &&
+        this.windowProxy?.location
+      ) {
         const sanitizedUrl = DOMPurify.sanitize(event.data.url);
         this.windowProxy.location = sanitizedUrl;
       } else {
@@ -238,7 +254,9 @@ export default class Checkout extends EventEmitter2 {
   }
 
   submit(): void {
-    this.windowProxy = window.parent.open("", "_blank");
+    if (this.paymentMethod === "ideal") {
+      this.windowProxy = window.parent.open("", "_blank");
+    }
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage("fung-submit", "*");
     }
@@ -246,7 +264,10 @@ export default class Checkout extends EventEmitter2 {
 
   setTheme(theme: ITheme): void {
     if (this.iframe) {
-      this.iframe.contentWindow?.postMessage(JSON.stringify({ type: CheckoutEvent.Theme, theme }), "*");
+      this.iframe.contentWindow?.postMessage(
+        JSON.stringify({ type: CheckoutEvent.Theme, theme }),
+        "*"
+      );
     }
   }
 }
