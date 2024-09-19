@@ -2,13 +2,11 @@ import { JSDOM } from "jsdom";
 import Checkout from "./checkout.js";
 import { CheckoutEvent } from "./config.js";
 
-jest.mock("iframe-resizer/js/iframeResizer.js", () =>
-  jest.fn().mockImplementation(() => ({
-    // whatever mock implementation or properties you want here
-    close: jest.fn(),
-    resize: jest.fn(),
-  }))
-);
+jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementation(() => ({
+  // whatever mock implementation or properties you want here
+  close: jest.fn(),
+  resize: jest.fn(),
+})));
 
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
@@ -98,7 +96,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     const postMessageSpy = jest.spyOn(
       iframe?.contentWindow as any,
-      "postMessage"
+      "postMessage",
     );
 
     checkout.setTheme(theme);
@@ -108,7 +106,7 @@ describe("@fung-sdk/checkout", () => {
         type: "checkout:theme",
         theme,
       }),
-      "*"
+      "*",
     );
   });
 
@@ -240,7 +238,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(window.addEventListener).toHaveBeenCalledWith(
       "message",
-      expect.any(Function)
+      expect.any(Function),
     );
   });
 
@@ -479,7 +477,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     const postMessageSpy = jest.spyOn(
       iframe?.contentWindow as any,
-      "postMessage"
+      "postMessage",
     );
 
     checkout.submit();
@@ -543,7 +541,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain(
-      "custom=param&style=embedded&language=fr&formOnly=true"
+      "custom=param&style=embedded&language=fr&formOnly=true",
     );
   });
 
@@ -572,5 +570,30 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain("language=en");
+  });
+
+  it("should open a new window if the event is of type IdealRedirect", (done) => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    const openSpy = jest.spyOn(window.parent, "open").mockImplementation(() => null);
+
+    checkout.render();
+    const iframe = document.querySelector("iframe");
+    const event = {
+      type: CheckoutEvent.IdealRedirect,
+      url: "http://test.com",
+    };
+
+    iframe?.contentWindow?.parent.postMessage(event, "*");
+
+    setTimeout(() => {
+      expect(openSpy).toHaveBeenCalledWith("http://test.com", "_blank");
+
+      openSpy.mockRestore();
+      done();
+    }, 0);
   });
 });

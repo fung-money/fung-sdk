@@ -167,7 +167,7 @@ export default class Checkout extends EventEmitter2 {
         this.resize(CheckoutEvent.ResizeReset);
       } else if (event.data.type === CheckoutEvent.IdealRedirect) {
         window.parent.open(event.data.url, "_blank");
-      }  else {
+      } else {
         this.emit(event.data);
       }
     }
