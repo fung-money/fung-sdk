@@ -1,4 +1,5 @@
 import EventEmitter2 from "eventemitter2";
+import DOMPurify from "dompurify";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_LOCAL,
@@ -168,7 +169,8 @@ export default class Checkout extends EventEmitter2 {
       } else if (event.data === CheckoutEvent.ResizeReset) {
         this.resize(CheckoutEvent.ResizeReset);
       } else if (event.data.type === CheckoutEvent.IdealRedirect && this.windowProxy?.location) {
-        this.windowProxy.location = event.data.url;
+        const sanitizedUrl = DOMPurify.sanitize(event.data.url);
+        this.windowProxy.location = sanitizedUrl;
       } else {
         this.emit(event.data);
       }
