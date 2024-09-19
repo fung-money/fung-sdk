@@ -572,28 +572,31 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.src).toContain("language=en");
   });
 
-  it("should open a new window if the event is of type IdealRedirect", (done) => {
+  it("should handle IdealRedirect event by opening a new tab", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
     });
-
-    const openSpy = jest.spyOn(window.parent, "open").mockImplementation(() => null);
-
     checkout.render();
-    const iframe = document.querySelector("iframe");
-    const event = {
-      type: CheckoutEvent.IdealRedirect,
-      url: "http://test.com",
-    };
 
-    iframe?.contentWindow?.parent.postMessage(event, "*");
+    const url = "https://example.com/";
+    const event = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.IdealRedirect,
+        url,
+      },
+    });
 
-    setTimeout(() => {
-      expect(openSpy).toHaveBeenCalledWith("http://test.com", "_blank");
+    const appendChildSpy = jest.spyOn(document.body, "appendChild");
+    const removeChildSpy = jest.spyOn(document.body, "removeChild");
 
-      openSpy.mockRestore();
-      done();
-    }, 0);
+    window.dispatchEvent(event);
+
+    expect(appendChildSpy).toHaveBeenCalled();
+    expect(removeChildSpy).toHaveBeenCalled();
+    const anchor = appendChildSpy.mock.calls[0][0] as HTMLAnchorElement;
+    expect(anchor.href).toBe(url);
+    expect(anchor.target).toBe("_blank");
+    expect(anchor.rel).toBe("noopener noreferrer");
   });
 });
