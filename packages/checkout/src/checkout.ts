@@ -138,7 +138,7 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
     iframe.allow = "payment *";
-    iframe.setAttribute("sandbox", "allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts");
+    iframe.setAttribute("sandbox", "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin");
 
     if (!this.small) {
       iframe.style.minWidth = "400px";
