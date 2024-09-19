@@ -43,6 +43,8 @@ export default class Checkout extends EventEmitter2 {
 
   protected darkMode: boolean = false;
 
+  protected windowProxy: WindowProxy | null = null;
+
   constructor({
     checkoutId,
     container,
@@ -165,24 +167,8 @@ export default class Checkout extends EventEmitter2 {
         this.resize(CheckoutEvent.ResizeFull);
       } else if (event.data === CheckoutEvent.ResizeReset) {
         this.resize(CheckoutEvent.ResizeReset);
-      } else if (event.data.type === CheckoutEvent.IdealRedirect) {
-        const button = document.createElement("button");
-        button.style.display = "none";
-        document.body.appendChild(button);
-
-        button.addEventListener("click", () => {
-          const a = document.createElement("a");
-          a.href = event.data.url;
-          a.target = "_blank";
-          a.rel = "noopener noreferrer";
-          a.style.display = "none";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        });
-
-        button.click();
-        document.body.removeChild(button);
+      } else if (event.data.type === CheckoutEvent.IdealRedirect && this.windowProxy?.location) {
+        this.windowProxy.location = event.data.url;
       } else {
         this.emit(event.data);
       }
@@ -250,6 +236,7 @@ export default class Checkout extends EventEmitter2 {
   }
 
   submit(): void {
+    this.windowProxy = window.parent.open("", "_blank");
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage("fung-submit", "*");
     }
