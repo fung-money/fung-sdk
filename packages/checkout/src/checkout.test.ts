@@ -592,9 +592,9 @@ describe("@fung-sdk/checkout", () => {
 
     window.dispatchEvent(event);
 
-    expect(appendChildSpy).toHaveBeenCalled();
-    expect(removeChildSpy).toHaveBeenCalled();
-    const anchor = appendChildSpy.mock.calls[0][0] as HTMLAnchorElement;
+    expect(appendChildSpy).toHaveBeenCalledTimes(2); // Once for button, once for anchor
+    expect(removeChildSpy).toHaveBeenCalledTimes(2); // Once for button, once for anchor
+    const anchor = appendChildSpy.mock.calls[1][0] as HTMLAnchorElement;
     expect(anchor.href).toBe(url);
     expect(anchor.target).toBe("_blank");
     expect(anchor.rel).toBe("noopener noreferrer");
