@@ -480,9 +480,12 @@ describe("@fung-sdk/checkout", () => {
       "postMessage",
     );
 
+    const windowProxy = jest.spyOn(window.parent, "open");
+
     checkout.submit();
 
     expect(postMessageSpy).toHaveBeenCalledWith("fung-submit", "*");
+    expect(windowProxy).toHaveBeenCalledTimes(1);
   });
 
   it("should not post a message if iframe is not ready when submit is called", () => {
@@ -579,24 +582,10 @@ describe("@fung-sdk/checkout", () => {
     });
     checkout.render();
 
-    const url = "https://example.com/";
-    const event = new window.MessageEvent("message", {
-      data: {
-        type: CheckoutEvent.IdealRedirect,
-        url,
-      },
-    });
+    const windowProxy = jest.spyOn(window.parent, "open");
 
-    const appendChildSpy = jest.spyOn(document.body, "appendChild");
-    const removeChildSpy = jest.spyOn(document.body, "removeChild");
+    checkout.submit();
 
-    window.dispatchEvent(event);
-
-    expect(appendChildSpy).toHaveBeenCalledTimes(2); // Once for button, once for anchor
-    expect(removeChildSpy).toHaveBeenCalledTimes(2); // Once for button, once for anchor
-    const anchor = appendChildSpy.mock.calls[1][0] as HTMLAnchorElement;
-    expect(anchor.href).toBe(url);
-    expect(anchor.target).toBe("_blank");
-    expect(anchor.rel).toBe("noopener noreferrer");
+    expect(windowProxy).toHaveBeenCalledTimes(1);
   });
 });
