@@ -1,4 +1,5 @@
 import EventEmitter2 from "eventemitter2";
+import DOMPurify from "dompurify";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_LOCAL,
@@ -6,7 +7,6 @@ import {
   CHECKOUT_ENDPOINT_SBX,
   CheckoutEvent,
 } from "./config.js";
-
 export type Env = "production" | "sandbox" | "development" | "local";
 
 interface ITheme {
@@ -210,8 +210,9 @@ export default class Checkout extends EventEmitter2 {
   }
 
   private static createAndClickAnchor(url: string): void {
+    const sanitizedUrl = DOMPurify.sanitize(url);
     const a = document.createElement("a");
-    a.href = url;
+    a.href = sanitizedUrl;
     a.target = "_blank";
     a.rel = "noopener noreferrer";
     a.style.display = "none";
