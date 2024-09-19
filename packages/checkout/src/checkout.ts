@@ -166,14 +166,23 @@ export default class Checkout extends EventEmitter2 {
       } else if (event.data === CheckoutEvent.ResizeReset) {
         this.resize(CheckoutEvent.ResizeReset);
       } else if (event.data.type === CheckoutEvent.IdealRedirect) {
-        const a = document.createElement("a");
-        a.href = event.data.url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const button = document.createElement("button");
+        button.style.display = "none";
+        document.body.appendChild(button);
+
+        button.addEventListener("click", () => {
+          const a = document.createElement("a");
+          a.href = event.data.url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        });
+
+        button.click();
+        document.body.removeChild(button);
       } else {
         this.emit(event.data);
       }
