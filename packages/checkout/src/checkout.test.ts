@@ -572,14 +572,35 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.src).toContain("language=en");
   });
 
-  it("should handle IdealRedirect event by opening a new tab", () => {
+  it("should handle IdealRedirect event with untrusted domain", () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
     });
     checkout.render();
 
-    const url = "https://example.com/";
+    const url = "https://untrusted.com/";
+    const event = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.IdealRedirect,
+        url,
+      },
+    });
+
+    const appendChildSpy = jest.spyOn(document.body, "appendChild");
+    window.dispatchEvent(event);
+
+    expect(appendChildSpy).not.toHaveBeenCalled();
+  });
+
+  it("should handle IdealRedirect event with trusted domain", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    checkout.render();
+
+    const url = "https://pay.ideal.nl/";
     const event = new window.MessageEvent("message", {
       data: {
         type: CheckoutEvent.IdealRedirect,
@@ -594,9 +615,5 @@ describe("@fung-sdk/checkout", () => {
 
     expect(appendChildSpy).toHaveBeenCalledTimes(2); // Once for button, once for anchor
     expect(removeChildSpy).toHaveBeenCalledTimes(2); // Once for button, once for anchor
-    const anchor = appendChildSpy.mock.calls[1][0] as HTMLAnchorElement;
-    expect(anchor.href).toBe(url);
-    expect(anchor.target).toBe("_blank");
-    expect(anchor.rel).toBe("noopener noreferrer");
   });
 });

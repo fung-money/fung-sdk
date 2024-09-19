@@ -166,23 +166,7 @@ export default class Checkout extends EventEmitter2 {
       } else if (event.data === CheckoutEvent.ResizeReset) {
         this.resize(CheckoutEvent.ResizeReset);
       } else if (event.data.type === CheckoutEvent.IdealRedirect) {
-        const button = document.createElement("button");
-        button.style.display = "none";
-        document.body.appendChild(button);
-
-        button.addEventListener("click", () => {
-          const a = document.createElement("a");
-          a.href = event.data.url;
-          a.target = "_blank";
-          a.rel = "noopener noreferrer";
-          a.style.display = "none";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        });
-
-        button.click();
-        document.body.removeChild(button);
+        Checkout.handleIdealRedirect(event);
       } else {
         this.emit(event.data);
       }
@@ -190,7 +174,9 @@ export default class Checkout extends EventEmitter2 {
   };
 
   private attachEventListeners(): void {
-    window.addEventListener("message", this.handleMessage);
+    if (!window.addEventListener.toString().includes("handleMessage")) {
+      window.addEventListener("message", this.handleMessage);
+    }
   }
 
   private resize(event: string): void {
@@ -223,6 +209,42 @@ export default class Checkout extends EventEmitter2 {
     }
   }
 
+  private static createAndClickAnchor(url: string): void {
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  private static handleIdealRedirect(event: MessageEvent): void {
+    const url = new URL(event.data.url);
+    const trustedDomains = [
+      /^pay\.ideal\.nl$/,
+      /^.*\.fungpayments\.com$/,
+    ];
+
+    const isTrustedDomain = trustedDomains.some((pattern) => pattern.test(url.hostname));
+
+    if (!isTrustedDomain) {
+      return;
+    }
+
+    const button = document.createElement("button");
+    button.style.display = "none";
+    document.body.appendChild(button);
+
+    button.addEventListener("click", () => {
+      Checkout.createAndClickAnchor(event.data.url);
+    });
+
+    button.click();
+    document.body.removeChild(button);
+  }
+
   dispose(): void {
     if (this.iframe) {
       this.iframe.remove();
@@ -242,6 +264,7 @@ export default class Checkout extends EventEmitter2 {
 
     this.container.innerHTML = "";
     this.container.appendChild(iframe);
+
     this.attachEventListeners();
   }
 
