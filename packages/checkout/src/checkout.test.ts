@@ -584,6 +584,16 @@ describe("@fung-sdk/checkout", () => {
 
     const windowProxy = jest.spyOn(window.parent, "open");
 
+    const url = "https://example.com/";
+    const event = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.IdealRedirect,
+        url,
+      },
+    });
+
+    window.dispatchEvent(event);
+
     checkout.submit();
 
     expect(windowProxy).toHaveBeenCalledTimes(1);
