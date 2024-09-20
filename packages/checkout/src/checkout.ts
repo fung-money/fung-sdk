@@ -140,14 +140,15 @@ export default class Checkout extends EventEmitter2 {
     iframe.allow = "payment *";
 
     if (!this.small) {
-      iframe.style.minWidth = "400px";
-      iframe.style.minHeight = "650px";
+      iframe.style.minWidth = "375px";
+      iframe.style.minHeight = "max-content";
     } else {
       iframe.style.width = "100%";
+
       if (this.height) {
         iframe.style.minHeight = this.height;
       } else {
-        iframe.style.height = "auto";
+        iframe.style.height = "max-content";
       }
     }
 
