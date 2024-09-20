@@ -209,15 +209,15 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.zIndex = "9999";
     } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
       if (!this.small) {
-        this.iframe.style.minWidth = "400px";
-        this.iframe.style.minHeight = "650px";
+        this.iframe.style.minWidth = "375px";
+        this.iframe.style.minHeight = "max-content";
       }
       this.iframe.style.border = "none";
       this.iframe.style.width = "100%";
       if (this.height) {
         this.iframe.style.minHeight = this.height;
       } else {
-        this.iframe.style.height = "auto";
+        this.iframe.style.height = "max-content";
       }
       this.iframe.style.position = "relative";
       this.iframe.style.top = "0";
