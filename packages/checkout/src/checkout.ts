@@ -1,4 +1,5 @@
 import EventEmitter2 from "eventemitter2";
+import DOMPurify from "dompurify";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_LOCAL,
@@ -43,6 +44,10 @@ export default class Checkout extends EventEmitter2 {
 
   protected darkMode: boolean = false;
 
+  protected windowProxy: WindowProxy | null = null;
+
+  paymentMethod: string | undefined;
+
   constructor({
     checkoutId,
     container,
@@ -63,7 +68,7 @@ export default class Checkout extends EventEmitter2 {
     url?: string | null;
     small?: boolean;
     height?: string;
-    formOnly?: boolean
+    formOnly?: boolean;
     walletsOnly?: boolean;
     language?: string;
     darkMode?: boolean;
@@ -121,13 +126,15 @@ export default class Checkout extends EventEmitter2 {
         baseUrl = CHECKOUT_ENDPOINT_LOCAL;
         break;
       default:
-        // No default, as we assign default in the constructor
+      // No default, as we assign default in the constructor
     }
 
     if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
     if (this.url) return `${this.url}${this.getQueryParameters()}`;
 
-    return `${baseUrl}/checkout/${this.checkoutId}/view${this.getQueryParameters()}`;
+    return `${baseUrl}/checkout/${
+      this.checkoutId
+    }/view${this.getQueryParameters()}`;
   }
 
   private createIframe(): HTMLIFrameElement {
@@ -138,6 +145,10 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.border = "none";
     iframe.className = "w-full";
     iframe.allow = "payment *";
+    iframe.setAttribute(
+      "sandbox",
+      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin",
+    );
 
     if (!this.small) {
       iframe.style.minWidth = "375px";
@@ -159,12 +170,22 @@ export default class Checkout extends EventEmitter2 {
   }
 
   private handleMessage = (event: MessageEvent): void => {
-    if (Object.values(CheckoutEvent).includes(event.data)
-        || Object.values(CheckoutEvent).includes(event.data.type)) {
+    if (
+      Object.values(CheckoutEvent).includes(event.data)
+      || Object.values(CheckoutEvent).includes(event.data.type)
+    ) {
       if (event.data === CheckoutEvent.ResizeFull) {
         this.resize(CheckoutEvent.ResizeFull);
       } else if (event.data === CheckoutEvent.ResizeReset) {
         this.resize(CheckoutEvent.ResizeReset);
+      } else if (event.data.type === CheckoutEvent.PaymentMethodSelected) {
+        this.paymentMethod = event.data.paymentMethod;
+      } else if (
+        event.data.type === CheckoutEvent.IdealRedirect
+        && this.windowProxy?.location
+      ) {
+        const sanitizedUrl = DOMPurify.sanitize(event.data.url);
+        this.windowProxy.location = sanitizedUrl;
       } else {
         this.emit(event.data);
       }
@@ -232,6 +253,9 @@ export default class Checkout extends EventEmitter2 {
   }
 
   submit(): void {
+    if (this.paymentMethod === "ideal") {
+      this.windowProxy = window.parent.open(`https://sbx.pay.fungpayments.com/processing?language=${this.language}`, "_blank");
+    }
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage("fung-submit", "*");
     }
@@ -239,7 +263,10 @@ export default class Checkout extends EventEmitter2 {
 
   setTheme(theme: ITheme): void {
     if (this.iframe) {
-      this.iframe.contentWindow?.postMessage(JSON.stringify({ type: CheckoutEvent.Theme, theme }), "*");
+      this.iframe.contentWindow?.postMessage(
+        JSON.stringify({ type: CheckoutEvent.Theme, theme }),
+        "*",
+      );
     }
   }
 }

@@ -573,4 +573,36 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain("language=en");
   });
+
+  it("should handle IdealRedirect event by opening a new tab", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    checkout.render();
+
+    const windowProxy = jest.spyOn(window.parent, "open");
+
+    const idealSelectedEvent = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.PaymentMethodSelected,
+        paymentMethod: "ideal",
+      },
+    });
+    window.dispatchEvent(idealSelectedEvent);
+
+    const url = "https://example.com/";
+    const idealRedirectEvent = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.IdealRedirect,
+        url,
+      },
+    });
+
+    window.dispatchEvent(idealRedirectEvent);
+
+    checkout.submit();
+
+    expect(windowProxy).toHaveBeenCalledTimes(1);
+  });
 });
