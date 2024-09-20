@@ -1,6 +1,6 @@
 {
   "name": "@fung-sdk/checkout",
-  "version": "1.10.13",
+  "version": "1.10.12",
   "description": "",
   "types": "./dist/types/index.d.ts",
   "main": "./dist/index.js",
