@@ -289,7 +289,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(iframe).not.toBeNull();
     expect(iframe?.style.width).toBe("100%");
-    expect(iframe?.style.height).toBe("max-content");
+    expect(iframe?.style.height).toBe("");
   });
 
   it("should reset the iframe size on CHECKOUT_RESIZE_RESET event when small", () => {
@@ -305,7 +305,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(iframe).not.toBeNull();
     expect(iframe?.style.width).toBe("100%");
-    expect(iframe?.style.height).toBe("max-content");
+    expect(iframe?.style.height).toBe("");
   });
 
   it("should emit CHECKOUT_SUCCESS event on successful message", async () => {
