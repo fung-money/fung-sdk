@@ -46,11 +46,6 @@ export default class Checkout extends EventEmitter2 {
 
   protected windowProxy: WindowProxy | null = null;
 
-  protected style = {
-    minWidth: "375px",
-    minHeight: "max-content",
-  };
-
   paymentMethod: string | undefined;
 
   constructor({
@@ -162,15 +157,15 @@ export default class Checkout extends EventEmitter2 {
     );
 
     if (!this.small) {
-      iframe.style.minWidth = this.style.minWidth;
-      iframe.style.minHeight = this.style.minHeight;
+      iframe.style.minWidth = "375px";
+      iframe.style.minHeight = "max-content";
     } else {
       iframe.style.width = "100%";
 
       if (this.height) {
         iframe.style.minHeight = this.height;
       } else {
-        iframe.style.height = this.style.minHeight;
+        iframe.style.height = "max-content";
       }
     }
 
@@ -220,15 +215,15 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.zIndex = "9999";
     } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
       if (!this.small) {
-        this.iframe.style.minWidth = this.style.minWidth;
-        this.iframe.style.minHeight = this.style.minHeight;
+        this.iframe.style.minWidth = "375px";
+        this.iframe.style.minHeight = "max-content";
       }
       this.iframe.style.border = "none";
       this.iframe.style.width = "100%";
       if (this.height) {
         this.iframe.style.minHeight = this.height;
       } else {
-        this.iframe.style.height = this.style.minHeight;
+        this.iframe.style.height = "max-content";
       }
       this.iframe.style.position = "relative";
       this.iframe.style.top = "0";
