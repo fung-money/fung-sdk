@@ -110,7 +110,7 @@ export default class Checkout extends EventEmitter2 {
     return `?${params.toString()}`;
   }
 
-  private getBaseUrl() {
+  private getCheckoutUrl() {
     let baseUrl;
     switch (this.env) {
       case "production":
@@ -128,12 +128,6 @@ export default class Checkout extends EventEmitter2 {
       default:
       // No default, as we assign default in the constructor
     }
-
-    return baseUrl;
-  }
-
-  private getCheckoutUrl() {
-    const baseUrl = this.getBaseUrl();
 
     if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
     if (this.url) return `${this.url}${this.getQueryParameters()}`;
@@ -157,15 +151,14 @@ export default class Checkout extends EventEmitter2 {
     );
 
     if (!this.small) {
-      iframe.style.minWidth = "375px";
-      iframe.style.minHeight = "max-content";
+      iframe.style.minWidth = "400px";
+      iframe.style.minHeight = "650px";
     } else {
       iframe.style.width = "100%";
-
       if (this.height) {
         iframe.style.minHeight = this.height;
       } else {
-        iframe.style.height = "max-content";
+        iframe.style.height = "auto";
       }
     }
 
@@ -215,15 +208,15 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.zIndex = "9999";
     } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
       if (!this.small) {
-        this.iframe.style.minWidth = "375px";
-        this.iframe.style.minHeight = "max-content";
+        this.iframe.style.minWidth = "400px";
+        this.iframe.style.minHeight = "650px";
       }
       this.iframe.style.border = "none";
       this.iframe.style.width = "100%";
       if (this.height) {
         this.iframe.style.minHeight = this.height;
       } else {
-        this.iframe.style.height = "max-content";
+        this.iframe.style.height = "auto";
       }
       this.iframe.style.position = "relative";
       this.iframe.style.top = "0";
@@ -260,7 +253,7 @@ export default class Checkout extends EventEmitter2 {
 
   submit(): void {
     if (this.paymentMethod === "ideal") {
-      this.windowProxy = window.parent.open(`${this.getBaseUrl()}/processing?language=${this.language}`, "_blank");
+      this.windowProxy = window.parent.open(`https://sbx.pay.fungpayments.com/processing?language=${this.language}`, "_blank");
     }
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage("fung-submit", "*");
