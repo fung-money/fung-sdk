@@ -48,6 +48,11 @@ export default class Checkout extends EventEmitter2 {
 
   paymentMethod: string | undefined;
 
+  protected style = {
+    minWidth: "375px",
+    minHeight: "max-content",
+  };
+
   constructor({
     checkoutId,
     container,
@@ -155,17 +160,15 @@ export default class Checkout extends EventEmitter2 {
       "sandbox",
       "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin",
     );
+    iframe.style.width = "100%";
 
     if (!this.small) {
-      iframe.style.minWidth = "400px";
-      iframe.style.minHeight = "650px";
+      iframe.style.minWidth = this.style.minWidth;
+      iframe.style.minHeight = this.style.minHeight;
+    } else if (this.height) {
+      iframe.style.minHeight = this.height;
     } else {
-      iframe.style.width = "100%";
-      if (this.height) {
-        iframe.style.minHeight = this.height;
-      } else {
-        iframe.style.height = "auto";
-      }
+      iframe.style.height = this.style.minHeight;
     }
 
     import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
@@ -214,15 +217,15 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.zIndex = "9999";
     } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
       if (!this.small) {
-        this.iframe.style.minWidth = "400px";
-        this.iframe.style.minHeight = "650px";
+        this.iframe.style.minWidth = this.style.minWidth;
+        this.iframe.style.minHeight = this.style.minHeight;
       }
       this.iframe.style.border = "none";
       this.iframe.style.width = "100%";
       if (this.height) {
         this.iframe.style.minHeight = this.height;
       } else {
-        this.iframe.style.height = "auto";
+        this.iframe.style.height = this.style.minHeight;
       }
       this.iframe.style.position = "relative";
       this.iframe.style.top = "0";
@@ -257,13 +260,29 @@ export default class Checkout extends EventEmitter2 {
     return !!this.iframe;
   }
 
-  submit(): void {
+  /**
+   * @param preSubmitCallback Function to be called before submitting the payment,
+   *                          if pre submit fails, the payment will not be submitted
+   * @returns preSubmitCallback value, if any
+   */
+  async submit(preSubmitCallback?: () => Promise<any>): Promise<any> {
     if (this.paymentMethod === "ideal") {
       this.windowProxy = window.parent.open(`${this.getBaseUrl()}/processing?language=${this.language}`, "_blank");
     }
+
+    let result: any;
+    try {
+      result = await preSubmitCallback?.();
+    } catch (error) {
+      this.windowProxy?.close();
+      throw error;
+    }
+
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage("fung-submit", "*");
     }
+
+    return result;
   }
 
   setTheme(theme: ITheme): void {
