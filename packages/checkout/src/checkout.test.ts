@@ -2,13 +2,11 @@ import { JSDOM } from "jsdom";
 import Checkout from "./checkout.js";
 import { CheckoutEvent } from "./config.js";
 
-jest.mock("iframe-resizer/js/iframeResizer.js", () =>
-  jest.fn().mockImplementation(() => ({
-    // whatever mock implementation or properties you want here
-    close: jest.fn(),
-    resize: jest.fn(),
-  }))
-);
+jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementation(() => ({
+  // whatever mock implementation or properties you want here
+  close: jest.fn(),
+  resize: jest.fn(),
+})));
 
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
@@ -98,7 +96,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     const postMessageSpy = jest.spyOn(
       iframe?.contentWindow as any,
-      "postMessage"
+      "postMessage",
     );
 
     checkout.setTheme(theme);
@@ -108,7 +106,7 @@ describe("@fung-sdk/checkout", () => {
         type: "checkout:theme",
         theme,
       }),
-      "*"
+      "*",
     );
   });
 
@@ -240,7 +238,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(window.addEventListener).toHaveBeenCalledWith(
       "message",
-      expect.any(Function)
+      expect.any(Function),
     );
   });
 
@@ -255,8 +253,8 @@ describe("@fung-sdk/checkout", () => {
     iframe?.contentWindow?.parent.postMessage(CheckoutEvent.ResizeReset, "*");
 
     expect(iframe).not.toBeNull();
-    expect(iframe?.style.minWidth).toBe("400px");
-    expect(iframe?.style.minHeight).toBe("650px");
+    expect(iframe?.style.minWidth).toBe("375px");
+    expect(iframe?.style.minHeight).toBe("max-content");
   });
 
   it("should resize the iframe to full screen on CHECKOUT_RESIZE_RESET event, and keep the set height when small=true", () => {
@@ -289,7 +287,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(iframe).not.toBeNull();
     expect(iframe?.style.width).toBe("100%");
-    expect(iframe?.style.height).toBe("auto");
+    expect(iframe?.style.height).toBe("");
   });
 
   it("should reset the iframe size on CHECKOUT_RESIZE_RESET event when small", () => {
@@ -305,7 +303,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(iframe).not.toBeNull();
     expect(iframe?.style.width).toBe("100%");
-    expect(iframe?.style.height).toBe("auto");
+    expect(iframe?.style.height).toBe("");
   });
 
   it("should emit CHECKOUT_SUCCESS event on successful message", async () => {
@@ -469,7 +467,7 @@ describe("@fung-sdk/checkout", () => {
     expect(checkout.isReadyToSubmit()).toBe(false);
   });
 
-  it("should post a message to the iframe when submit is called", () => {
+  it("should post a message to the iframe when submit is called", async () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
@@ -479,15 +477,15 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     const postMessageSpy = jest.spyOn(
       iframe?.contentWindow as any,
-      "postMessage"
+      "postMessage",
     );
 
-    checkout.submit();
+    await checkout.submit();
 
     expect(postMessageSpy).toHaveBeenCalledWith("fung-submit", "*");
   });
 
-  it("should not post a message if iframe is not ready when submit is called", () => {
+  it("should not post a message if iframe is not ready when submit is called", async () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
@@ -495,7 +493,7 @@ describe("@fung-sdk/checkout", () => {
 
     const postMessageSpy = jest.spyOn(window, "postMessage");
 
-    checkout.submit();
+    await checkout.submit();
 
     expect(postMessageSpy).not.toHaveBeenCalled();
   });
@@ -543,7 +541,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain(
-      "custom=param&style=embedded&language=fr&formOnly=true"
+      "custom=param&style=embedded&language=fr&formOnly=true",
     );
   });
 
@@ -574,7 +572,7 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe?.src).toContain("language=en");
   });
 
-  it("should handle IdealRedirect event by opening a new tab", () => {
+  it("should handle IdealRedirect event by opening a new tab", async () => {
     const checkout = new Checkout({
       checkoutId: "abc",
       containerId: "xyz",
@@ -601,8 +599,84 @@ describe("@fung-sdk/checkout", () => {
 
     window.dispatchEvent(idealRedirectEvent);
 
-    checkout.submit();
+    await checkout.submit();
 
+    expect(windowProxy).toHaveBeenCalledTimes(1);
+  });
+
+  it("should invoke preSubmitCallback IdealRedirect event by opening a new tab", async () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    checkout.render();
+
+    const windowProxy = jest.spyOn(window.parent, "open");
+
+    const idealSelectedEvent = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.PaymentMethodSelected,
+        paymentMethod: "ideal",
+      },
+    });
+    window.dispatchEvent(idealSelectedEvent);
+
+    const url = "https://example.com/";
+    const idealRedirectEvent = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.IdealRedirect,
+        url,
+      },
+    });
+
+    window.dispatchEvent(idealRedirectEvent);
+
+    const result = await checkout.submit(() => Promise.resolve(true));
+
+    expect(result).toBe(true);
+
+    expect(windowProxy).toHaveBeenCalledTimes(1);
+  });
+
+  it("should invoke preSubmitCallback and throw error on IdealRedirect event by opening a new tab", async () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+    checkout.render();
+
+    const windowProxy = jest.spyOn(window.parent, "open");
+
+    const idealSelectedEvent = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.PaymentMethodSelected,
+        paymentMethod: "ideal",
+      },
+    });
+    window.dispatchEvent(idealSelectedEvent);
+
+    const url = "https://example.com/";
+    const idealRedirectEvent = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.IdealRedirect,
+        url,
+      },
+    });
+
+    window.dispatchEvent(idealRedirectEvent);
+
+    let result: any;
+    try {
+      result = await checkout.submit(() => Promise.resolve(true).then(() => {
+        throw new Error("Avada Kedavra");
+      }));
+
+      throw new Error("You shall not pass!");
+    } catch (error: any) {
+      expect(error.message).toBe("Avada Kedavra");
+    }
+
+    expect(result).toBeUndefined();
     expect(windowProxy).toHaveBeenCalledTimes(1);
   });
 });
