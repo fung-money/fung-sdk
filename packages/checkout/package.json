@@ -65,6 +65,6 @@
   "dependencies": {
     "dompurify": "^3.1.6",
     "eventemitter2": "^6.4.9",
-    "iframe-resizer": "^4.3.7"
+    "iframe-resizer": "^5.3.1"
   }
 }
