@@ -186,6 +186,10 @@ export default class Checkout extends EventEmitter2 {
         this.resize(CheckoutEvent.ResizeFull);
       } else if (event.data === CheckoutEvent.ResizeReset) {
         this.resize(CheckoutEvent.ResizeReset);
+      } else if (event.data.type === CheckoutEvent.ResizeIframeHeight) {
+        this.resizeIframeHeight(event.data.height);
+      } else if (event.data === CheckoutEvent.ResetIframeHeight) {
+        this.resetIframeHeight();
       } else if (event.data.type === CheckoutEvent.PaymentMethodSelected) {
         this.paymentMethod = event.data.paymentMethod;
       } else if (
@@ -202,6 +206,18 @@ export default class Checkout extends EventEmitter2 {
 
   private attachEventListeners(): void {
     window.addEventListener("message", this.handleMessage);
+  }
+
+  private resizeIframeHeight(height: string): void {
+    if (this.iframe) {
+      this.iframe.style.minHeight = height;
+    }
+  }
+
+  private resetIframeHeight(): void {
+    if (this.iframe) {
+      this.iframe.style.minHeight = this.style.minHeight;
+    }
   }
 
   private resize(event: string): void {
