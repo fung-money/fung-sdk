@@ -50,7 +50,8 @@ export default class Checkout extends EventEmitter2 {
 
   protected style = {
     minWidth: "375px",
-    minHeight: "max-content",
+    // minHeight: "max-content",
+    minHeight: "600px", // TODO CHECK
   };
 
   constructor({
@@ -81,7 +82,8 @@ export default class Checkout extends EventEmitter2 {
     super();
 
     if (!checkoutId) throw new Error("checkoutId is required");
-    if (!container && !containerId) throw new Error("Either container or containerId is required");
+    if (!container && !containerId)
+      throw new Error("Either container or containerId is required");
 
     this.checkoutId = checkoutId;
     this.container = container || document.getElementById(containerId || "");
@@ -140,7 +142,8 @@ export default class Checkout extends EventEmitter2 {
   private getCheckoutUrl() {
     const baseUrl = this.getBaseUrl();
 
-    if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+    if (this.walletsOnly)
+      return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
     if (this.url) return `${this.url}${this.getQueryParameters()}`;
 
     return `${baseUrl}/checkout/${
@@ -158,7 +161,7 @@ export default class Checkout extends EventEmitter2 {
     iframe.allow = "payment *";
     iframe.setAttribute(
       "sandbox",
-      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin",
+      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
     );
     iframe.style.width = "100%";
 
@@ -179,8 +182,8 @@ export default class Checkout extends EventEmitter2 {
 
   private handleMessage = (event: MessageEvent): void => {
     if (
-      Object.values(CheckoutEvent).includes(event.data)
-      || Object.values(CheckoutEvent).includes(event.data.type)
+      Object.values(CheckoutEvent).includes(event.data) ||
+      Object.values(CheckoutEvent).includes(event.data.type)
     ) {
       if (event.data === CheckoutEvent.ResizeFull) {
         this.resize(CheckoutEvent.ResizeFull);
@@ -189,8 +192,8 @@ export default class Checkout extends EventEmitter2 {
       } else if (event.data.type === CheckoutEvent.PaymentMethodSelected) {
         this.paymentMethod = event.data.paymentMethod;
       } else if (
-        event.data.type === CheckoutEvent.IdealRedirect
-        && this.windowProxy?.location
+        event.data.type === CheckoutEvent.IdealRedirect &&
+        this.windowProxy?.location
       ) {
         const sanitizedUrl = DOMPurify.sanitize(event.data.url);
         this.windowProxy.location = sanitizedUrl;
@@ -267,7 +270,10 @@ export default class Checkout extends EventEmitter2 {
    */
   async submit(preSubmitCallback?: () => Promise<any>): Promise<any> {
     if (this.paymentMethod === "ideal") {
-      this.windowProxy = window.parent.open(`${this.getBaseUrl()}/processing?language=${this.language}`, "_blank");
+      this.windowProxy = window.parent.open(
+        `${this.getBaseUrl()}/processing?language=${this.language}`,
+        "_blank"
+      );
     }
 
     let result: any;
@@ -279,7 +285,13 @@ export default class Checkout extends EventEmitter2 {
     }
 
     if (this.iframe) {
-      this.iframe.contentWindow?.postMessage("fung-submit", "*");
+      this.iframe.contentWindow?.postMessage(
+        {
+          type: "fung-submit",
+          paymentMethod: this.paymentMethod,
+        },
+        "*"
+      );
     }
 
     return result;
@@ -289,7 +301,7 @@ export default class Checkout extends EventEmitter2 {
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage(
         JSON.stringify({ type: CheckoutEvent.Theme, theme }),
-        "*",
+        "*"
       );
     }
   }
