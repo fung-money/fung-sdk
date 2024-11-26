@@ -80,9 +80,12 @@ export default class Checkout extends EventEmitter2 {
   }) {
     super();
 
-    if (!checkoutId) throw new Error('checkoutId is required');
-    if (!container && !containerId)
+    if (!checkoutId) {
+      throw new Error('checkoutId is required');
+    }
+    if (!container && !containerId) {
       throw new Error('Either container or containerId is required');
+    }
 
     this.checkoutId = checkoutId;
     this.container = container || document.getElementById(containerId || '');
