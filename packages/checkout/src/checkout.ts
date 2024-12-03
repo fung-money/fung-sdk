@@ -81,9 +81,12 @@ export default class Checkout extends EventEmitter2 {
   }) {
     super();
 
-    if (!checkoutId) throw new Error("checkoutId is required");
-    if (!container && !containerId)
+    if (!checkoutId) {
+      throw new Error("checkoutId is required");
+    }
+    if (!container && !containerId) {
       throw new Error("Either container or containerId is required");
+    }
 
     this.checkoutId = checkoutId;
     this.container = container || document.getElementById(containerId || "");
@@ -158,10 +161,10 @@ export default class Checkout extends EventEmitter2 {
 
     iframe.style.border = "none";
     iframe.className = "w-full";
-    iframe.allow = "payment *";
+    iframe.allow = "payment *; encrypted-media *";
     iframe.setAttribute(
       "sandbox",
-      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
+      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-forms"
     );
     iframe.style.width = "100%";
 
@@ -189,6 +192,10 @@ export default class Checkout extends EventEmitter2 {
         this.resize(CheckoutEvent.ResizeFull);
       } else if (event.data === CheckoutEvent.ResizeReset) {
         this.resize(CheckoutEvent.ResizeReset);
+      } else if (event.data.type === CheckoutEvent.ResizeIframeHeight) {
+        this.resizeIframeHeight(event.data.height);
+      } else if (event.data === CheckoutEvent.ResetIframeHeight) {
+        this.resetIframeHeight();
       } else if (event.data.type === CheckoutEvent.PaymentMethodSelected) {
         this.paymentMethod = event.data.paymentMethod;
       } else if (
@@ -205,6 +212,18 @@ export default class Checkout extends EventEmitter2 {
 
   private attachEventListeners(): void {
     window.addEventListener("message", this.handleMessage);
+  }
+
+  private resizeIframeHeight(height: string): void {
+    if (this.iframe) {
+      this.iframe.style.minHeight = height;
+    }
+  }
+
+  private resetIframeHeight(): void {
+    if (this.iframe) {
+      this.iframe.style.minHeight = this.style.minHeight;
+    }
   }
 
   private resize(event: string): void {

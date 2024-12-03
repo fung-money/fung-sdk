@@ -14,4 +14,6 @@ export enum CheckoutEvent {
   Theme = "checkout:theme",
   IdealRedirect = "checkout:ideal-redirect",
   PaymentMethodSelected = "checkout:payment-method-selected",
+  ResizeIframeHeight = "resize:iframe-height",
+  ResetIframeHeight = "reset:iframe-height",
 }

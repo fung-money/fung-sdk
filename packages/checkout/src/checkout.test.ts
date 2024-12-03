@@ -679,4 +679,45 @@ describe("@fung-sdk/checkout", () => {
     expect(result).toBeUndefined();
     expect(windowProxy).toHaveBeenCalledTimes(1);
   });
+
+  it("should call resize iframe height when resize:iframe-height event is received", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    checkout.render();
+
+    const resizeIframeHeightEvent = new window.MessageEvent("message", {
+      data: {
+        type: CheckoutEvent.ResizeIframeHeight,
+        height: "100px",
+      },
+    });
+
+    window.dispatchEvent(resizeIframeHeightEvent);
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.minHeight).toBe("100px");
+  });
+
+  it("should reset iframe height when reset:iframe-height event is received", () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+    });
+
+    checkout.render();
+
+    const resetIframeHeightEvent = new window.MessageEvent("message", {
+      data: CheckoutEvent.ResetIframeHeight,
+    });
+
+    window.dispatchEvent(resetIframeHeightEvent);
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.minHeight).toBe("max-content");
+  });
 });
