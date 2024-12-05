@@ -287,13 +287,7 @@ export default class Checkout extends EventEmitter2 {
     }
 
     if (this.iframe) {
-      this.iframe.contentWindow?.postMessage(
-        {
-          type: "fung-submit",
-          paymentMethod: this.paymentMethod,
-        },
-        "*"
-      );
+      this.iframe.contentWindow?.postMessage("fung-submit", "*");
     }
 
     return result;
