@@ -34,7 +34,7 @@ export default class Checkout extends EventEmitter2 {
 
   protected small: boolean = false;
 
-  protected height: string | undefined = undefined;
+  protected height: string;
 
   protected formOnly: boolean = false;
 
@@ -49,9 +49,8 @@ export default class Checkout extends EventEmitter2 {
   paymentMethod: string | undefined;
 
   protected style = {
+    defaultHeight: "650px",
     minWidth: "375px",
-    // minHeight: "max-content",
-    minHeight: "600px", // TODO CHECK
   };
 
   constructor({
@@ -60,7 +59,6 @@ export default class Checkout extends EventEmitter2 {
     containerId,
     env = "production",
     url = null,
-    small = false,
     height,
     formOnly = false,
     walletsOnly = false,
@@ -92,14 +90,11 @@ export default class Checkout extends EventEmitter2 {
     this.container = container || document.getElementById(containerId || "");
     this.env = env;
     this.url = url;
-    this.small = small;
-    this.height = height;
+    this.height = height || this.style.defaultHeight;
     this.formOnly = formOnly;
     this.walletsOnly = walletsOnly;
     this.language = language;
     this.darkMode = darkMode;
-
-    if (this.walletsOnly) this.small = true;
   }
 
   private getQueryParameters(): string {
@@ -167,18 +162,15 @@ export default class Checkout extends EventEmitter2 {
       "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-forms"
     );
     iframe.style.width = "100%";
-
-    if (!this.small) {
-      iframe.style.minWidth = this.style.minWidth;
-      iframe.style.minHeight = this.style.minHeight;
-    } else if (this.height) {
-      iframe.style.minHeight = this.height;
-    } else {
-      iframe.style.height = this.style.minHeight;
-    }
+    iframe.style.height = this.height || this.style.defaultHeight;
 
     import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
-      iFrameResize({ checkOrigin: false }, iframe);
+      iFrameResize(
+        {
+          checkOrigin: false,
+        },
+        iframe
+      );
     });
     return iframe;
   }
@@ -220,10 +212,9 @@ export default class Checkout extends EventEmitter2 {
     }
   }
 
+  // TODO This will need to take into account the height of the currently selected payment method
   private resetIframeHeight(): void {
-    if (this.iframe) {
-      this.iframe.style.minHeight = this.style.minHeight;
-    }
+    this.resizeIframeHeight(this.style.defaultHeight);
   }
 
   private resize(event: string): void {
@@ -238,17 +229,9 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.left = "0";
       this.iframe.style.zIndex = "9999";
     } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
-      if (!this.small) {
-        this.iframe.style.minWidth = this.style.minWidth;
-        this.iframe.style.minHeight = this.style.minHeight;
-      }
       this.iframe.style.border = "none";
       this.iframe.style.width = "100%";
-      if (this.height) {
-        this.iframe.style.minHeight = this.height;
-      } else {
-        this.iframe.style.height = this.style.minHeight;
-      }
+      this.iframe.style.height = this.style.defaultHeight;
       this.iframe.style.position = "relative";
       this.iframe.style.top = "0";
       this.iframe.style.left = "0";
