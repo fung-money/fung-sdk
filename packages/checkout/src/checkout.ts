@@ -21,6 +21,26 @@ interface ITheme {
   logoUrl: string;
 }
 
+interface IConstructor {
+  checkoutId: string;
+  container?: HTMLElement;
+  containerId?: string;
+  env?: Env;
+  url?: string | null;
+  small?: boolean;
+  height?: string;
+  formOnly?: boolean;
+  walletsOnly?: boolean;
+  language?: string;
+  darkMode?: boolean;
+}
+
+interface IDefaultStyle {
+  height: string;
+  maxWidth: string;
+  minWidth: string;
+}
+
 export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
 
@@ -48,7 +68,7 @@ export default class Checkout extends EventEmitter2 {
 
   paymentMethod: string | undefined;
 
-  protected defaultStyle = {
+  protected defaultStyle: IDefaultStyle = {
     height: "600px",
     maxWidth: "425px",
     minWidth: "375px",
@@ -65,19 +85,7 @@ export default class Checkout extends EventEmitter2 {
     walletsOnly = false,
     language = "en",
     darkMode = false,
-  }: {
-    checkoutId: string;
-    container?: HTMLElement;
-    containerId?: string;
-    env?: Env;
-    url?: string | null;
-    small?: boolean;
-    height?: string;
-    formOnly?: boolean;
-    walletsOnly?: boolean;
-    language?: string;
-    darkMode?: boolean;
-  }) {
+  }: IConstructor) {
     super();
 
     if (!checkoutId) {
@@ -155,6 +163,7 @@ export default class Checkout extends EventEmitter2 {
     this.iframe = iframe;
     iframe.src = this.getCheckoutUrl();
 
+    // set iframe styles
     iframe.style.border = "none";
     iframe.allow = "payment *; encrypted-media *";
     iframe.setAttribute(
@@ -164,7 +173,9 @@ export default class Checkout extends EventEmitter2 {
     iframe.style.width = "100%";
     iframe.style.minWidth = this.defaultStyle.minWidth;
     iframe.style.height = this.height || this.defaultStyle.height;
-    iframe.style.maxWidth = this.formOnly ? "unset" : this.defaultStyle.maxWidth;
+    iframe.style.maxWidth = this.formOnly
+      ? "unset"
+      : this.defaultStyle.maxWidth;
 
     import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
       iFrameResize(
