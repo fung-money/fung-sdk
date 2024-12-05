@@ -1,5 +1,5 @@
-import EventEmitter2 from "eventemitter2";
 import DOMPurify from "dompurify";
+import EventEmitter2 from "eventemitter2";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_LOCAL,
@@ -7,39 +7,14 @@ import {
   CHECKOUT_ENDPOINT_SBX,
   CheckoutEvent,
 } from "./config.js";
+import {
+  IConstructor,
+  IDefaultStyle,
+  ITheme,
+  TCheckoutMessage,
+} from "./types.js";
 
 export type Env = "production" | "sandbox" | "development" | "local";
-
-interface ITheme {
-  accentColor: string;
-  accentColorContrast: string;
-  borderRadius: string;
-  brandColor: string;
-  brandColorContrast: string;
-  // "Inter" | "Courier New" | "Georgia" | "Helvetica" | "Montserrat" | "Roboto" | "Poppins";
-  fontFamily: string;
-  logoUrl: string;
-}
-
-interface IConstructor {
-  checkoutId: string;
-  container?: HTMLElement;
-  containerId?: string;
-  env?: Env;
-  url?: string | null;
-  small?: boolean;
-  height?: string;
-  formOnly?: boolean;
-  walletsOnly?: boolean;
-  language?: string;
-  darkMode?: boolean;
-}
-
-interface IDefaultStyle {
-  height: string;
-  maxWidth: string;
-  minWidth: string;
-}
 
 export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
@@ -188,31 +163,39 @@ export default class Checkout extends EventEmitter2 {
     return iframe;
   }
 
-  // TODO this needs to be tested with the dispatchMethodV2
-  private handleMessage = (event: MessageEvent): void => {
-    if (
-      Object.values(CheckoutEvent).includes(event.data) ||
-      Object.values(CheckoutEvent).includes(event.data.type)
-    ) {
-      if (event.data === CheckoutEvent.ResizeFull) {
+  private handleMessage = (event: MessageEvent<TCheckoutMessage>): void => {
+    if (!Object.values(CheckoutEvent).includes(event.data.type)) return;
+
+    switch (event.data.type) {
+      case CheckoutEvent.ResizeFull:
         this.resize(CheckoutEvent.ResizeFull);
-      } else if (event.data === CheckoutEvent.ResizeReset) {
+        break;
+
+      case CheckoutEvent.ResizeReset:
         this.resize(CheckoutEvent.ResizeReset);
-      } else if (event.data.type === CheckoutEvent.ResizeIframeHeight) {
+        break;
+
+      case CheckoutEvent.ResizeIframeHeight:
         this.resizeIframeHeight(event.data.height);
-      } else if (event.data === CheckoutEvent.ResetIframeHeight) {
+        break;
+
+      case CheckoutEvent.ResetIframeHeight:
         this.resetIframeHeight();
-      } else if (event.data.type === CheckoutEvent.PaymentMethodSelected) {
+        break;
+
+      case CheckoutEvent.PaymentMethodSelected:
         this.paymentMethod = event.data.paymentMethod;
-      } else if (
-        event.data.type === CheckoutEvent.IdealRedirect &&
-        this.windowProxy?.location
-      ) {
-        const sanitizedUrl = DOMPurify.sanitize(event.data.url);
-        this.windowProxy.location = sanitizedUrl;
-      } else {
+        break;
+
+      case CheckoutEvent.IdealRedirect:
+        if (this.windowProxy?.location) {
+          const sanitizedUrl = DOMPurify.sanitize(event.data.url);
+          this.windowProxy.location = sanitizedUrl;
+        }
+        break;
+
+      default:
         this.emit(event.data);
-      }
     }
   };
 
@@ -226,13 +209,14 @@ export default class Checkout extends EventEmitter2 {
     }
   }
 
-  // TODO This will need to take into account the height of the currently selected payment method
   private resetIframeHeight(): void {
     this.resizeIframeHeight(this.defaultStyle.height);
   }
 
   private resize(event: string): void {
-    if (event === CheckoutEvent.ResizeFull && this.iframe !== null) {
+    if (this.iframe === null) return;
+
+    if (event === CheckoutEvent.ResizeFull) {
       this.iframe.style.width = "100vw";
       this.iframe.style.height = "100vh";
       this.iframe.style.minWidth = "0px";
@@ -242,7 +226,9 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.top = "0";
       this.iframe.style.left = "0";
       this.iframe.style.zIndex = "9999";
-    } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
+    }
+
+    if (event === CheckoutEvent.ResizeReset) {
       this.iframe.style.border = "none";
       this.iframe.style.width = "100%";
       this.iframe.style.height = this.defaultStyle.height;
