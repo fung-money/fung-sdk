@@ -48,8 +48,9 @@ export default class Checkout extends EventEmitter2 {
 
   paymentMethod: string | undefined;
 
-  protected style = {
-    defaultHeight: "650px",
+  protected defaultStyle = {
+    height: "600px",
+    maxWidth: "425px",
     minWidth: "375px",
   };
 
@@ -90,7 +91,7 @@ export default class Checkout extends EventEmitter2 {
     this.container = container || document.getElementById(containerId || "");
     this.env = env;
     this.url = url;
-    this.height = height || this.style.defaultHeight;
+    this.height = height || this.defaultStyle.height;
     this.formOnly = formOnly;
     this.walletsOnly = walletsOnly;
     this.language = language;
@@ -155,14 +156,15 @@ export default class Checkout extends EventEmitter2 {
     iframe.src = this.getCheckoutUrl();
 
     iframe.style.border = "none";
-    iframe.className = "w-full";
     iframe.allow = "payment *; encrypted-media *";
     iframe.setAttribute(
       "sandbox",
       "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-forms"
     );
     iframe.style.width = "100%";
-    iframe.style.height = this.height || this.style.defaultHeight;
+    iframe.style.minWidth = this.defaultStyle.minWidth;
+    iframe.style.height = this.height || this.defaultStyle.height;
+    iframe.style.maxWidth = this.formOnly ? "unset" : this.defaultStyle.maxWidth;
 
     import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
       iFrameResize(
@@ -175,6 +177,7 @@ export default class Checkout extends EventEmitter2 {
     return iframe;
   }
 
+  // TODO this needs to be tested with the dispatchMethodV2
   private handleMessage = (event: MessageEvent): void => {
     if (
       Object.values(CheckoutEvent).includes(event.data) ||
@@ -214,7 +217,7 @@ export default class Checkout extends EventEmitter2 {
 
   // TODO This will need to take into account the height of the currently selected payment method
   private resetIframeHeight(): void {
-    this.resizeIframeHeight(this.style.defaultHeight);
+    this.resizeIframeHeight(this.defaultStyle.height);
   }
 
   private resize(event: string): void {
@@ -231,7 +234,7 @@ export default class Checkout extends EventEmitter2 {
     } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
       this.iframe.style.border = "none";
       this.iframe.style.width = "100%";
-      this.iframe.style.height = this.style.defaultHeight;
+      this.iframe.style.height = this.defaultStyle.height;
       this.iframe.style.position = "relative";
       this.iframe.style.top = "0";
       this.iframe.style.left = "0";
