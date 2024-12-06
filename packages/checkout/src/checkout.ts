@@ -44,7 +44,7 @@ export default class Checkout extends EventEmitter2 {
   paymentMethod: string | undefined;
 
   protected defaultStyle: IDefaultStyle = {
-    height: "600px",
+    height: "630px",
     maxWidth: "425px",
     minWidth: "375px",
   };
@@ -66,6 +66,7 @@ export default class Checkout extends EventEmitter2 {
     if (!checkoutId) {
       throw new Error("checkoutId is required");
     }
+
     if (!container && !containerId) {
       throw new Error("Either container or containerId is required");
     }
@@ -126,6 +127,7 @@ export default class Checkout extends EventEmitter2 {
 
     if (this.walletsOnly)
       return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+
     if (this.url) return `${this.url}${this.getQueryParameters()}`;
 
     return `${baseUrl}/checkout/${
@@ -164,7 +166,7 @@ export default class Checkout extends EventEmitter2 {
   }
 
   // This is here to bridge a breaking change between the way checkout v1 and checkout v2 emit messages
-  // The goal is for the checkout to always emit an object with a type property
+  // The new checkout emits an object with a type property, but the old checkout emits a string.
   private constructEventV2(event: MessageEvent) {
     const newEvent = { data: event.data };
 
@@ -176,7 +178,7 @@ export default class Checkout extends EventEmitter2 {
   }
 
   // Once this is is published we can update the MessageEvent type to MessageEvent<TCheckoutMessage>
-  private handleMessage = (event: MessageEvent): void => {
+  private handleCheckoutMessage = (event: MessageEvent): void => {
     if (
       !(
         Object.values(CheckoutEvent).includes(event.data) ||
@@ -229,7 +231,7 @@ export default class Checkout extends EventEmitter2 {
   };
 
   private attachEventListeners(): void {
-    window.addEventListener("message", this.handleMessage);
+    window.addEventListener("message", this.handleCheckoutMessage);
   }
 
   private resizeIframeHeight(height: string): void {
@@ -273,7 +275,7 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.remove();
     }
 
-    window.removeEventListener("message", this.handleMessage);
+    window.removeEventListener("message", this.handleCheckoutMessage);
 
     this.removeAllListeners();
   }
