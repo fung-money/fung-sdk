@@ -7,12 +7,7 @@ import {
   CHECKOUT_ENDPOINT_SBX,
   CheckoutEvent,
 } from "./config.js";
-import {
-  IConstructor,
-  IDefaultStyle,
-  ITheme,
-  TCheckoutMessage,
-} from "./types.js";
+import { IConstructor, IDefaultStyle, ITheme } from "./types.js";
 
 export type Env = "production" | "sandbox" | "development" | "local";
 
@@ -44,8 +39,8 @@ export default class Checkout extends EventEmitter2 {
   paymentMethod: string | undefined;
 
   protected defaultStyle: IDefaultStyle = {
-    height: "630px",
-    maxWidth: "425px",
+    height: "675px", // This is based off the combined height of the card payment including email field and wallet component since its the biggest
+    maxWidth: "450px",
     minWidth: "375px",
   };
 
