@@ -8,6 +8,7 @@ import {
   CheckoutEvent,
 } from "./config.js";
 import { IConstructor, IDefaultStyle, ITheme } from "./types.js";
+import { constructEventV2, isValidCheckoutEventMessage } from "./helper.js";
 
 export type Env = "production" | "sandbox" | "development" | "local";
 
@@ -39,9 +40,11 @@ export default class Checkout extends EventEmitter2 {
   paymentMethod: string | undefined;
 
   protected defaultStyle: IDefaultStyle = {
-    height: "675px", // This is based off the combined height of the card payment including email field and wallet component since its the biggest
+    embeddedHeight: "665px", // This is based off the combined height of the card payment including email field and wallet component since its the biggest
+    formOnlyHeight: "330px", // this is based off the card payment height
     maxWidth: "450px",
     minWidth: "375px",
+    minHeight: "200px",
   };
 
   constructor({
@@ -66,11 +69,15 @@ export default class Checkout extends EventEmitter2 {
       throw new Error("Either container or containerId is required");
     }
 
+    const defaultHeight = this.formOnly
+      ? this.defaultStyle.formOnlyHeight
+      : this.defaultStyle.embeddedHeight;
+
     this.checkoutId = checkoutId;
     this.container = container || document.getElementById(containerId || "");
     this.env = env;
     this.url = url;
-    this.height = height || this.defaultStyle.height;
+    this.height = height || defaultHeight;
     this.formOnly = formOnly;
     this.walletsOnly = walletsOnly;
     this.language = language;
@@ -144,7 +151,8 @@ export default class Checkout extends EventEmitter2 {
     );
     iframe.style.width = "100%";
     iframe.style.minWidth = this.defaultStyle.minWidth;
-    iframe.style.height = this.height || this.defaultStyle.height;
+    iframe.style.height = this.height;
+    iframe.style.minHeight = this.defaultStyle.minHeight;
     iframe.style.maxWidth = this.formOnly
       ? "unset"
       : this.defaultStyle.maxWidth;
@@ -157,33 +165,15 @@ export default class Checkout extends EventEmitter2 {
         iframe
       );
     });
+
     return iframe;
-  }
-
-  // This is here to bridge a breaking change between the way checkout v1 and checkout v2 emit messages
-  // The new checkout emits an object with a type property, but the old checkout emits a string.
-  private constructEventV2(event: MessageEvent) {
-    const newEvent = { data: event.data };
-
-    if (typeof newEvent.data === "string") {
-      newEvent.data = { type: newEvent.data };
-    }
-
-    return newEvent;
   }
 
   // Once this is is published we can update the MessageEvent type to MessageEvent<TCheckoutMessage>
   private handleCheckoutMessage = (event: MessageEvent): void => {
-    if (
-      !(
-        Object.values(CheckoutEvent).includes(event.data) ||
-        Object.values(CheckoutEvent).includes(event.data.type)
-      )
-    ) {
-      return;
-    }
+    if (!isValidCheckoutEventMessage(event)) return;
 
-    const eventV2 = this.constructEventV2(event);
+    const eventV2 = constructEventV2(event);
 
     //TODO: remove all these console.logs when tested
     switch (eventV2.data.type) {
@@ -236,7 +226,7 @@ export default class Checkout extends EventEmitter2 {
   }
 
   private resetIframeHeight(): void {
-    this.resizeIframeHeight(this.defaultStyle.height);
+    this.resizeIframeHeight(this.height);
   }
 
   private resize(event: string): void {
@@ -257,7 +247,7 @@ export default class Checkout extends EventEmitter2 {
     if (event === CheckoutEvent.ResizeReset) {
       this.iframe.style.border = "none";
       this.iframe.style.width = "100%";
-      this.iframe.style.height = this.defaultStyle.height;
+      this.iframe.style.height = this.height;
       this.iframe.style.position = "relative";
       this.iframe.style.top = "0";
       this.iframe.style.left = "0";

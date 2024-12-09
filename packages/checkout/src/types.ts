@@ -27,9 +27,11 @@ export interface IConstructor {
 }
 
 export interface IDefaultStyle {
-  height: string;
+  embeddedHeight: string;
+  formOnlyHeight: string;
   maxWidth: string;
   minWidth: string;
+  minHeight: string;
 }
 
 // Creating type safe messages + data for the handleMessage method
