@@ -40,8 +40,8 @@ export default class Checkout extends EventEmitter2 {
   paymentMethod: string | undefined;
 
   protected defaultStyle: IDefaultStyle = {
-    embeddedHeight: "665px", // This is based off the combined height of the card payment including email field and wallet component since its the biggest
-    formOnlyHeight: "330px", // this is based off the card payment height
+    embeddedHeight: "655px", // This is based off the combined height of the card payment including email field and wallet component since its the biggest
+    formOnlyHeight: "326px", // this is based off the card payment height
     maxWidth: "450px",
     minWidth: "375px",
     minHeight: "200px",
@@ -69,7 +69,7 @@ export default class Checkout extends EventEmitter2 {
       throw new Error("Either container or containerId is required");
     }
 
-    const defaultHeight = this.formOnly
+    const defaultHeight = formOnly
       ? this.defaultStyle.formOnlyHeight
       : this.defaultStyle.embeddedHeight;
 
