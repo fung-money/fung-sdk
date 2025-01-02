@@ -202,7 +202,7 @@ export default class Checkout extends EventEmitter2 {
         this.windowProxy?.location
       ) {
         const sanitizedUrl = DOMPurify.sanitize(event.data.url);
-        this.windowProxy.location = sanitizedUrl;
+        this.windowProxy.location.assign(sanitizedUrl);
       } else {
         this.emit(event.data);
       }
