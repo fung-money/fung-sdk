@@ -2,11 +2,13 @@ import { JSDOM } from "jsdom";
 import Checkout from "./checkout.js";
 import { CheckoutEvent } from "./config.js";
 
-jest.mock("iframe-resizer/js/iframeResizer.js", () => jest.fn().mockImplementation(() => ({
-  // whatever mock implementation or properties you want here
-  close: jest.fn(),
-  resize: jest.fn(),
-})));
+jest.mock("iframe-resizer/js/iframeResizer.js", () =>
+  jest.fn().mockImplementation(() => ({
+    // whatever mock implementation or properties you want here
+    close: jest.fn(),
+    resize: jest.fn(),
+  }))
+);
 
 describe("@fung-sdk/checkout", () => {
   beforeEach(() => {
@@ -96,7 +98,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     const postMessageSpy = jest.spyOn(
       iframe?.contentWindow as any,
-      "postMessage",
+      "postMessage"
     );
 
     checkout.setTheme(theme);
@@ -106,7 +108,7 @@ describe("@fung-sdk/checkout", () => {
         type: "checkout:theme",
         theme,
       }),
-      "*",
+      "*"
     );
   });
 
@@ -238,7 +240,7 @@ describe("@fung-sdk/checkout", () => {
 
     expect(window.addEventListener).toHaveBeenCalledWith(
       "message",
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -477,12 +479,31 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     const postMessageSpy = jest.spyOn(
       iframe?.contentWindow as any,
-      "postMessage",
+      "postMessage"
     );
 
     await checkout.submit();
 
     expect(postMessageSpy).toHaveBeenCalledWith("fung-submit", "*");
+  });
+
+  it("should not post a message to the iframe when walletsOnly is true", async () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      walletsOnly: true,
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    const postMessageSpy = jest.spyOn(
+      iframe?.contentWindow as any,
+      "postMessage"
+    );
+
+    await checkout.submit();
+
+    expect(postMessageSpy).not.toHaveBeenCalled();
   });
 
   it("should not post a message if iframe is not ready when submit is called", async () => {
@@ -541,7 +562,7 @@ describe("@fung-sdk/checkout", () => {
     const iframe = document.querySelector("iframe");
     expect(iframe).not.toBeNull();
     expect(iframe?.src).toContain(
-      "custom=param&style=embedded&language=fr&formOnly=true",
+      "custom=param&style=embedded&language=fr&formOnly=true"
     );
   });
 
@@ -667,9 +688,11 @@ describe("@fung-sdk/checkout", () => {
 
     let result: any;
     try {
-      result = await checkout.submit(() => Promise.resolve(true).then(() => {
-        throw new Error("Avada Kedavra");
-      }));
+      result = await checkout.submit(() =>
+        Promise.resolve(true).then(() => {
+          throw new Error("Avada Kedavra");
+        })
+      );
 
       throw new Error("You shall not pass!");
     } catch (error: any) {
