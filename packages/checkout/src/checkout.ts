@@ -287,14 +287,20 @@ export default class Checkout extends EventEmitter2 {
    * @returns preSubmitCallback value, if any
    */
   async submit(preSubmitCallback?: () => Promise<any>): Promise<any> {
-    if (this.paymentMethod === 'ideal' && !this.walletsOnly) {
+    let result: any;
+
+    // If walletsOnly is true, we don't need to submit the payment
+    if (this.walletsOnly) {
+      return result;
+    }
+
+    if (this.paymentMethod === 'ideal') {
       this.windowProxy = window.parent.open(
         `${this.getBaseUrl()}/processing?language=${this.language}`,
         '_blank'
       );
     }
 
-    let result: any;
     try {
       result = await preSubmitCallback?.();
     } catch (error) {
