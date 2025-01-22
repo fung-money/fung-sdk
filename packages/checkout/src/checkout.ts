@@ -178,32 +178,26 @@ export default class Checkout extends EventEmitter2 {
     //TODO: remove all these console.logs when tested
     switch (eventV2.data.type) {
       case CheckoutEvent.ResizeFull:
-        console.log("SDKEVENT ResizeFull");
         this.resize(CheckoutEvent.ResizeFull);
         break;
 
       case CheckoutEvent.ResizeReset:
-        console.log("SDKEVENT ResizeReset");
         this.resize(CheckoutEvent.ResizeReset);
         break;
 
       case CheckoutEvent.ResizeIframeHeight:
-        console.log("SDKEVENT ResizeIframeHeight");
         this.resizeIframeHeight(event.data.height);
         break;
 
       case CheckoutEvent.ResetIframeHeight:
-        console.log("SDKEVENT ResetIframeHeight");
         this.resetIframeHeight();
         break;
 
       case CheckoutEvent.PaymentMethodSelected:
-        console.log("SDKEVENT PaymentMethodSelected");
         this.paymentMethod = event.data.paymentMethod;
         break;
 
       case CheckoutEvent.IdealRedirect:
-        console.log("SDKEVENT IdealRedirect");
         if (this.windowProxy?.location) {
           const sanitizedUrl = DOMPurify.sanitize(event.data.url);
           this.windowProxy.location = sanitizedUrl;
