@@ -19,11 +19,7 @@ export default class Checkout extends EventEmitter2 {
 
   protected env: Env;
 
-  protected url: string | null;
-
   protected iframe: HTMLIFrameElement | null = null;
-
-  protected small: boolean = false;
 
   protected height: string;
 
@@ -52,7 +48,6 @@ export default class Checkout extends EventEmitter2 {
     container,
     containerId,
     env = "production",
-    url = null,
     height,
     formOnly = false,
     walletsOnly = false,
@@ -76,7 +71,6 @@ export default class Checkout extends EventEmitter2 {
     this.checkoutId = checkoutId;
     this.container = container || document.getElementById(containerId || "");
     this.env = env;
-    this.url = url;
     this.height = height || defaultHeight;
     this.formOnly = formOnly;
     this.walletsOnly = walletsOnly;
@@ -86,24 +80,20 @@ export default class Checkout extends EventEmitter2 {
 
   private getQueryParameters(): string {
     const params = new URLSearchParams();
-    if (this.url) {
-      const url = new URL(this.url);
-      url.searchParams.forEach((value, key) => {
-        params.append(key, value);
-      });
-    }
 
     params.append("style", "embedded");
     params.append("language", this.language);
 
     if (this.darkMode) params.append("dark", "true");
     if (this.formOnly) params.append("formOnly", "true");
+    if (this.walletsOnly) params.append("walletsOnly", "true");
 
     return `?${params.toString()}`;
   }
 
   private getBaseUrl() {
     let baseUrl;
+
     switch (this.env) {
       case "production":
         baseUrl = CHECKOUT_ENDPOINT_PROD;
@@ -126,11 +116,6 @@ export default class Checkout extends EventEmitter2 {
 
   private getCheckoutUrl() {
     const baseUrl = this.getBaseUrl();
-
-    if (this.walletsOnly)
-      return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
-
-    if (this.url) return `${this.url}${this.getQueryParameters()}`;
 
     return `${baseUrl}/checkout/${
       this.checkoutId
