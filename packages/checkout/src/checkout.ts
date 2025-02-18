@@ -1,14 +1,14 @@
-import EventEmitter2 from 'eventemitter2';
-import DOMPurify from 'dompurify';
+import EventEmitter2 from "eventemitter2";
+import DOMPurify from "dompurify";
 import {
   CHECKOUT_ENDPOINT_DEV,
   CHECKOUT_ENDPOINT_LOCAL,
   CHECKOUT_ENDPOINT_PROD,
   CHECKOUT_ENDPOINT_SBX,
   CheckoutEvent,
-} from './config.js';
+} from "./config.js";
 
-export type Env = 'production' | 'sandbox' | 'development' | 'local';
+export type Env = "production" | "sandbox" | "development" | "local";
 
 interface ITheme {
   accentColor: string;
@@ -40,7 +40,7 @@ export default class Checkout extends EventEmitter2 {
 
   protected walletsOnly: boolean = false;
 
-  protected language: string = 'en';
+  protected language: string = "en";
 
   protected darkMode: boolean = false;
 
@@ -49,21 +49,21 @@ export default class Checkout extends EventEmitter2 {
   paymentMethod: string | undefined;
 
   protected style = {
-    minWidth: '375px',
-    minHeight: 'max-content',
+    minWidth: "375px",
+    minHeight: "max-content",
   };
 
   constructor({
     checkoutId,
     container,
     containerId,
-    env = 'production',
+    env = "production",
     url = null,
     small = false,
     height,
     formOnly = false,
     walletsOnly = false,
-    language = 'en',
+    language = "en",
     darkMode = false,
   }: {
     checkoutId: string;
@@ -81,14 +81,14 @@ export default class Checkout extends EventEmitter2 {
     super();
 
     if (!checkoutId) {
-      throw new Error('checkoutId is required');
+      throw new Error("checkoutId is required");
     }
     if (!container && !containerId) {
-      throw new Error('Either container or containerId is required');
+      throw new Error("Either container or containerId is required");
     }
 
     this.checkoutId = checkoutId;
-    this.container = container || document.getElementById(containerId || '');
+    this.container = container || document.getElementById(containerId || "");
     this.env = env;
     this.url = url;
     this.small = small;
@@ -110,11 +110,11 @@ export default class Checkout extends EventEmitter2 {
       });
     }
 
-    params.append('style', 'embedded');
-    params.append('language', this.language);
+    params.append("style", "embedded");
+    params.append("language", this.language);
 
-    if (this.darkMode) params.append('dark', 'true');
-    if (this.formOnly) params.append('formOnly', 'true');
+    if (this.darkMode) params.append("dark", "true");
+    if (this.formOnly) params.append("formOnly", "true");
 
     return `?${params.toString()}`;
   }
@@ -122,16 +122,16 @@ export default class Checkout extends EventEmitter2 {
   private getBaseUrl() {
     let baseUrl;
     switch (this.env) {
-      case 'production':
+      case "production":
         baseUrl = CHECKOUT_ENDPOINT_PROD;
         break;
-      case 'sandbox':
+      case "sandbox":
         baseUrl = CHECKOUT_ENDPOINT_SBX;
         break;
-      case 'development':
+      case "development":
         baseUrl = CHECKOUT_ENDPOINT_DEV;
         break;
-      case 'local':
+      case "local":
         baseUrl = CHECKOUT_ENDPOINT_LOCAL;
         break;
       default:
@@ -144,8 +144,7 @@ export default class Checkout extends EventEmitter2 {
   private getCheckoutUrl() {
     const baseUrl = this.getBaseUrl();
 
-    if (this.walletsOnly)
-      return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+    if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
     if (this.url) return `${this.url}${this.getQueryParameters()}`;
 
     return `${baseUrl}/checkout/${
@@ -154,18 +153,18 @@ export default class Checkout extends EventEmitter2 {
   }
 
   private createIframe(): HTMLIFrameElement {
-    const iframe = document.createElement('iframe');
+    const iframe = document.createElement("iframe");
     this.iframe = iframe;
     iframe.src = this.getCheckoutUrl();
 
-    iframe.style.border = 'none';
-    iframe.className = 'w-full';
-    iframe.allow = 'payment *; encrypted-media *';
+    iframe.style.border = "none";
+    iframe.className = "w-full";
+    iframe.allow = "payment *; encrypted-media *";
     iframe.setAttribute(
-      'sandbox',
-      'allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-forms'
+      "sandbox",
+      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-forms",
     );
-    iframe.style.width = '100%';
+    iframe.style.width = "100%";
 
     if (!this.small) {
       iframe.style.minWidth = this.style.minWidth;
@@ -176,7 +175,7 @@ export default class Checkout extends EventEmitter2 {
       iframe.style.height = this.style.minHeight;
     }
 
-    import('iframe-resizer').then(({ iframeResizer: iFrameResize }) => {
+    import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
       iFrameResize({ checkOrigin: false }, iframe);
     });
     return iframe;
@@ -184,12 +183,12 @@ export default class Checkout extends EventEmitter2 {
 
   private handleMessage = (event: MessageEvent): void => {
     if (
-      Object.values(CheckoutEvent).includes(event.data) ||
-      Object.values(CheckoutEvent).includes(event.data.type)
+      Object.values(CheckoutEvent).includes(event.data)
+      || Object.values(CheckoutEvent).includes(event.data.type)
     ) {
-      if (event.data === CheckoutEvent.ResizeFull) {
+      if (event.data === CheckoutEvent.ResizeFull && !this.formOnly) {
         this.resize(CheckoutEvent.ResizeFull);
-      } else if (event.data === CheckoutEvent.ResizeReset) {
+      } else if (event.data === CheckoutEvent.ResizeReset && !this.formOnly) {
         this.resize(CheckoutEvent.ResizeReset);
       } else if (event.data.type === CheckoutEvent.ResizeIframeHeight) {
         this.resizeIframeHeight(event.data.height);
@@ -198,8 +197,8 @@ export default class Checkout extends EventEmitter2 {
       } else if (event.data.type === CheckoutEvent.PaymentMethodSelected) {
         this.paymentMethod = event.data.paymentMethod;
       } else if (
-        event.data.type === CheckoutEvent.IdealRedirect &&
-        this.windowProxy?.location
+        event.data.type === CheckoutEvent.IdealRedirect
+        && this.windowProxy?.location
       ) {
         const sanitizedUrl = DOMPurify.sanitize(event.data.url);
         this.windowProxy.location = sanitizedUrl;
@@ -210,7 +209,7 @@ export default class Checkout extends EventEmitter2 {
   };
 
   private attachEventListeners(): void {
-    window.addEventListener('message', this.handleMessage);
+    window.addEventListener("message", this.handleMessage);
   }
 
   private resizeIframeHeight(height: string): void {
@@ -227,31 +226,31 @@ export default class Checkout extends EventEmitter2 {
 
   private resize(event: string): void {
     if (event === CheckoutEvent.ResizeFull && this.iframe !== null) {
-      this.iframe.style.width = '100vw';
-      this.iframe.style.height = '100vh';
-      this.iframe.style.minWidth = '0px';
-      this.iframe.style.minHeight = '0px';
-      this.iframe.style.border = 'none';
-      this.iframe.style.position = 'absolute';
-      this.iframe.style.top = '0';
-      this.iframe.style.left = '0';
-      this.iframe.style.zIndex = '9999';
+      this.iframe.style.width = "100vw";
+      this.iframe.style.height = "100vh";
+      this.iframe.style.minWidth = "0px";
+      this.iframe.style.minHeight = "0px";
+      this.iframe.style.border = "none";
+      this.iframe.style.position = "absolute";
+      this.iframe.style.top = "0";
+      this.iframe.style.left = "0";
+      this.iframe.style.zIndex = "9999";
     } else if (event === CheckoutEvent.ResizeReset && this.iframe !== null) {
       if (!this.small) {
         this.iframe.style.minWidth = this.style.minWidth;
         this.iframe.style.minHeight = this.style.minHeight;
       }
-      this.iframe.style.border = 'none';
-      this.iframe.style.width = '100%';
+      this.iframe.style.border = "none";
+      this.iframe.style.width = "100%";
       if (this.height) {
         this.iframe.style.minHeight = this.height;
       } else {
         this.iframe.style.height = this.style.minHeight;
       }
-      this.iframe.style.position = 'relative';
-      this.iframe.style.top = '0';
-      this.iframe.style.left = '0';
-      this.iframe.style.zIndex = '0';
+      this.iframe.style.position = "relative";
+      this.iframe.style.top = "0";
+      this.iframe.style.left = "0";
+      this.iframe.style.zIndex = "0";
     }
   }
 
@@ -260,7 +259,7 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.remove();
     }
 
-    window.removeEventListener('message', this.handleMessage);
+    window.removeEventListener("message", this.handleMessage);
 
     this.removeAllListeners();
   }
@@ -269,10 +268,10 @@ export default class Checkout extends EventEmitter2 {
     const iframe = this.createIframe();
 
     if (!this.container) {
-      throw new Error('No container found');
+      throw new Error("No container found");
     }
 
-    this.container.innerHTML = '';
+    this.container.innerHTML = "";
     this.container.appendChild(iframe);
     this.attachEventListeners();
   }
@@ -287,10 +286,10 @@ export default class Checkout extends EventEmitter2 {
    * @returns preSubmitCallback value, if any
    */
   async submit(preSubmitCallback?: () => Promise<any>): Promise<any> {
-    if (this.paymentMethod === 'ideal' && !this.walletsOnly) {
+    if (this.paymentMethod === "ideal" && !this.walletsOnly) {
       this.windowProxy = window.parent.open(
         `${this.getBaseUrl()}/processing?language=${this.language}`,
-        '_blank'
+        "_blank",
       );
     }
 
@@ -303,7 +302,7 @@ export default class Checkout extends EventEmitter2 {
     }
 
     if (this.iframe) {
-      this.iframe.contentWindow?.postMessage('fung-submit', '*');
+      this.iframe.contentWindow?.postMessage("fung-submit", "*");
     }
 
     return result;
@@ -313,7 +312,7 @@ export default class Checkout extends EventEmitter2 {
     if (this.iframe) {
       this.iframe.contentWindow?.postMessage(
         JSON.stringify({ type: CheckoutEvent.Theme, theme }),
-        '*'
+        "*",
       );
     }
   }
