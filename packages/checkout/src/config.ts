@@ -16,4 +16,5 @@ export enum CheckoutEvent {
   PaymentMethodSelected = "checkout:payment-method-selected",
   ResizeIframeHeight = "resize:iframe-height",
   ResetIframeHeight = "reset:iframe-height",
+  HideWallet = "resize:hide-wallets",
 }
