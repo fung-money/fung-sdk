@@ -720,4 +720,23 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.style.minHeight).toBe("max-content");
   });
+
+  it("should set container height to 0, for empty wallets", async () => {
+    const checkout = new Checkout({
+      checkoutId: "abc",
+      containerId: "xyz",
+      walletsOnly: true,
+    });
+    checkout.render();
+
+    const iframe = document.querySelector("iframe");
+    iframe?.contentWindow?.parent.postMessage(CheckoutEvent.HideWallet, "*");
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1000);
+    });
+
+    expect(iframe).not.toBeNull();
+    expect(iframe?.style.height).toBe("0px");
+  });
 });

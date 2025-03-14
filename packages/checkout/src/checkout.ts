@@ -202,6 +202,8 @@ export default class Checkout extends EventEmitter2 {
       ) {
         const sanitizedUrl = DOMPurify.sanitize(event.data.url);
         this.windowProxy.location = sanitizedUrl;
+      } else if (this.walletsOnly && event.data === CheckoutEvent.HideWallet) {
+        this.hideWalletsContainer();
       } else {
         this.emit(event.data);
       }
@@ -251,6 +253,12 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.top = "0";
       this.iframe.style.left = "0";
       this.iframe.style.zIndex = "0";
+    }
+  }
+
+  private hideWalletsContainer(): void {
+    if (this.iframe) {
+      this.iframe.style.height = "0px";
     }
   }
 
