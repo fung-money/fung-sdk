@@ -6,14 +6,6 @@ export const commonStyles = css`
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
       Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
       "Segoe UI Symbol";
-    --primary-color: #007aff;
-    --primary-color-hover: #005ec4;
-    --secondary-color: #6c757d;
-    --border-color: #ced4da;
-    --background-color: #f8f9fa;
-    --error-color: #dc3545;
-    --success-color: #28a745;
-    --input-background: #fff;
   }
 
   form {
@@ -23,10 +15,10 @@ export const commonStyles = css`
   }
 
   .form-section {
-    background-color: var(--input-background);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem;
+    background-color: var(--input-background, #fff);
+    border: 1px solid var(--border-color, #ced4da);
+    border-radius: var(--form-section-border-radius, 8px);
+    padding: var(--form-section-padding, 1.5rem);
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -41,13 +33,13 @@ export const commonStyles = css`
 
   .form-section p {
     margin: 0 0 1rem 0;
-    color: var(--secondary-color);
+    color: var(--secondary-color, #6c757d);
     font-size: 0.9rem;
   }
 
   .disabled-section {
     opacity: 0.6;
-    background-color: var(--background-color);
+    background-color: var(--background-color, #f8f9fa);
     pointer-events: none;
   }
 
@@ -91,24 +83,24 @@ export const commonStyles = css`
   textarea {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #ced4da);
     border-radius: 4px;
     font-size: 1rem;
     transition: border-color 0.2s, box-shadow 0.2s;
-    background-color: var(--input-background);
+    background-color: var(--input-background, #fff);
     box-sizing: border-box; /* Important for padding and width */
   }
 
   input:focus,
   textarea:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: var(--primary-color, #007aff);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
   }
 
   input:disabled,
   textarea:disabled {
-    background-color: var(--background-color);
+    background-color: var(--background-color, #f8f9fa);
     cursor: not-allowed;
   }
 
@@ -140,7 +132,7 @@ export const commonStyles = css`
   }
 
   .confirm-button {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color, #007aff);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -155,19 +147,19 @@ export const commonStyles = css`
   }
 
   .confirm-button:hover:not(:disabled) {
-    background-color: var(--primary-color-hover);
+    background-color: var(--primary-color-hover, #005ec4);
   }
 
   .confirm-button:disabled {
-    background-color: var(--secondary-color);
+    background-color: var(--secondary-color, #6c757d);
     opacity: 0.7;
     cursor: not-allowed;
   }
 
   .secondary-button {
     background-color: transparent;
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
+    color: var(--primary-color, #007aff);
+    border: 1px solid var(--primary-color, #007aff);
   }
 
   .secondary-button:hover:not(:disabled) {
@@ -180,7 +172,7 @@ export const commonStyles = css`
     left: 0;
     right: 0;
     background: #fff;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #ced4da);
     border-radius: 4px;
     margin-top: 4px;
     list-style: none;
@@ -197,7 +189,7 @@ export const commonStyles = css`
   }
 
   .suggestions-list li:hover {
-    background-color: var(--background-color);
+    background-color: var(--background-color, #f8f9fa);
   }
 
   .collapsible-header {
@@ -217,7 +209,7 @@ export const commonStyles = css`
     margin-bottom: 0.5rem;
     font-size: 1rem;
     color: #333;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color, #ced4da);
     padding-bottom: 0.5rem;
   }
 
@@ -225,10 +217,10 @@ export const commonStyles = css`
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: var(--background-color);
+    background-color: var(--background-color, #f8f9fa);
     padding: 1rem;
     border-radius: 4px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #ced4da);
 
     input {
       margin: 0;
@@ -252,19 +244,19 @@ export const commonStyles = css`
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem;
-    background-color: var(--background-color);
-    border: 1px solid var(--border-color);
+    background-color: var(--background-color, #f8f9fa);
+    border: 1px solid var(--border-color, #ced4da);
     border-radius: 4px;
   }
 
   .owner-item .ownership {
-    color: var(--secondary-color);
+    color: var(--secondary-color, #6c757d);
   }
 
   .remove-button {
     background: none;
     border: none;
-    color: var(--error-color);
+    color: var(--error-color, #dc3545);
     cursor: pointer;
     font-size: 0.8rem;
   }
@@ -275,7 +267,7 @@ export const commonStyles = css`
 
   .summary-section h4 {
     margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color, #ced4da);
     padding-bottom: 0.5rem;
   }
 
@@ -292,7 +284,7 @@ export const commonStyles = css`
 
   .summary-key {
     font-weight: 500;
-    color: var(--secondary-color);
+    color: var(--secondary-color, #6c757d);
     font-size: 0.875rem;
     margin-bottom: 0.25rem;
   }
@@ -319,7 +311,7 @@ export const commonStyles = css`
 
   .loader {
     border: 5px solid #f3f3f3;
-    border-top: 5px solid var(--primary-color);
+    border-top: 5px solid var(--primary-color, #007aff);
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -328,7 +320,7 @@ export const commonStyles = css`
 
   .loader-subtext {
     margin-top: 1rem;
-    color: var(--secondary-color);
+    color: var(--secondary-color, #6c757d);
     font-size: 0.9rem;
   }
 

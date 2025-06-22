@@ -1,14 +1,11 @@
 import { LitElement, html, css } from "lit";
 import { customElement } from "lit/decorators.js";
 import { OnboardingStep } from "../onboarding-step.js";
+import { commonStyles } from "../styles.js";
 
 @customElement("identity-verification")
 export class IdentityVerification extends OnboardingStep {
-  static styles = css`
-    :host {
-      display: block;
-    }
-  `;
+  static styles = [commonStyles];
 
   async saveData(): Promise<void> {
     console.log("Saving Legal Data...");
