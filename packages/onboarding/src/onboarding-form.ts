@@ -1,4 +1,6 @@
-import { LitElement, html, css, PropertyValues } from "lit";
+import {
+  LitElement, html, css,
+} from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { choose } from "lit/directives/choose.js";
 
@@ -138,8 +140,10 @@ export class OnboardingForm extends LitElement {
 
   @property({ type: String })
   public apiKey = "";
+
   @property({ type: String })
   public apiSecret = "";
+
   @property({ type: String })
   public baseUrl = "http://localhost:3000/api/v2";
 
@@ -148,15 +152,14 @@ export class OnboardingForm extends LitElement {
 
   private prevStep() {
     if (this._currentStep > 0) {
-      this._currentStep--;
+      this._currentStep -= 1;
       this.requestUpdate();
     }
   }
 
   private async nextStep() {
     const currentStepTag = STEPS[this._currentStep];
-    const currentStepComponent =
-      this.shadowRoot?.querySelector<OnboardingStep>(currentStepTag);
+    const currentStepComponent = this.shadowRoot?.querySelector<OnboardingStep>(currentStepTag);
 
     if (currentStepComponent) {
       currentStepComponent.saveData();
@@ -164,14 +167,14 @@ export class OnboardingForm extends LitElement {
   }
 
   private handleStepSaved(event: CustomEvent) {
-    console.log("Event received", event);
+    console.debug("Event received", event);
     this._currentStep = Math.min(this._currentStep + 1, STEPS.length - 1);
     this.requestUpdate();
   }
 
   private saveAndContinue() {
     this.dispatchEvent(
-      new CustomEvent("save-and-exit", { bubbles: true, composed: true })
+      new CustomEvent("save-and-exit", { bubbles: true, composed: true }),
     );
   }
 
@@ -191,73 +194,68 @@ export class OnboardingForm extends LitElement {
       <div class="onboarding-wrapper">
         <div class="stepper">
           ${STEPS.map(
-            (step, index) => html`
+    (step, index) => html`
               <div
                 class="step ${this._currentStep === index
-                  ? "active"
-                  : ""} ${this._currentStep > index ? "completed" : ""}"
+    ? "active"
+    : ""} ${this._currentStep > index ? "completed" : ""}"
               >
                 <div class="step-number">${index + 1}</div>
                 <div class="step-title">${this._formatStepTitle(step)}</div>
               </div>
               ${index < STEPS.length - 1
-                ? html`<div class="step-connector"></div>`
-                : ""}
-            `
-          )}
+    ? html`<div class="step-connector"></div>`
+    : ""}
+            `,
+  )}
         </div>
         <div class="flow-container" @step-saved=${this.handleStepSaved}>
           ${choose(
-            STEPS[this._currentStep],
-            [
-              [
-                "business-information",
-                () =>
-                  html`<business-information
+    STEPS[this._currentStep],
+    [
+      [
+        "business-information",
+        () => html`<business-information
                     .apiKey=${this.apiKey}
                     .apiSecret=${this.apiSecret}
                     .baseUrl=${this.baseUrl}
                   ></business-information>`,
-              ],
-              [
-                "related-parties",
-                () =>
-                  html`<related-parties
+      ],
+      [
+        "related-parties",
+        () => html`<related-parties
                     .apiKey=${this.apiKey}
                     .apiSecret=${this.apiSecret}
                     .baseUrl=${this.baseUrl}
                   ></related-parties>`,
-              ],
-              [
-                "upload-documents",
-                () =>
-                  html`<upload-documents
+      ],
+      [
+        "upload-documents",
+        () => html`<upload-documents
                     .apiKey=${this.apiKey}
                     .apiSecret=${this.apiSecret}
                     .baseUrl=${this.baseUrl}
                   ></upload-documents>`,
-              ],
-              [
-                "identity-verification",
-                () =>
-                  html`<identity-verification
+      ],
+      [
+        "identity-verification",
+        () => html`<identity-verification
                     .apiKey=${this.apiKey}
                     .apiSecret=${this.apiSecret}
                     .baseUrl=${this.baseUrl}
                   ></identity-verification>`,
-              ],
-              [
-                "application-summary",
-                () =>
-                  html`<application-summary
+      ],
+      [
+        "application-summary",
+        () => html`<application-summary
                     .apiKey=${this.apiKey}
                     .apiSecret=${this.apiSecret}
                     .baseUrl=${this.baseUrl}
                   ></application-summary>`,
-              ],
-            ],
-            () => html`<p>Something went wrong.</p>`
-          )}
+      ],
+    ],
+    () => html`<p>Something went wrong.</p>`,
+  )}
         </div>
 
         <div class="navigation">
@@ -277,8 +275,8 @@ export class OnboardingForm extends LitElement {
               .disabled=${this._currentStep === STEPS.length - 1}
             >
               ${this._currentStep === STEPS.length - 1
-                ? "Submit"
-                : "Save & Continue"}
+    ? "Submit"
+    : "Save & Continue"}
             </button>
           </div>
         </div>

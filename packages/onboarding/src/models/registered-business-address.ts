@@ -3,4 +3,4 @@ export interface RegisteredBusinessAddress {
   address: string;
   postalCode: string;
   city: string;
-} 
+}

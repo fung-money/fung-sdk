@@ -1,4 +1,4 @@
-import { RegisteredBusinessAddress } from './registered-business-address.js';
+import { RegisteredBusinessAddress } from "./registered-business-address.js";
 
 export interface BusinessDetails {
   businessName: string;
@@ -9,4 +9,4 @@ export interface BusinessDetails {
   vatNumber: string;
   tinNumber: string;
   registeredBusinessAddress: RegisteredBusinessAddress;
-} 
+}

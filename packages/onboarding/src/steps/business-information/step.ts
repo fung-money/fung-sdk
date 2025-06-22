@@ -12,40 +12,42 @@ import { ApiService } from "../../services/api.service.js";
 export class BusinessInformation extends OnboardingStep {
   constructor() {
     super();
-    console.log("BusinessInformation initialized");
+    console.debug("BusinessInformation initialized");
   }
 
   static styles = [commonStyles];
 
   @state()
   private _businessDetails: BusinessDetails = {
-    businessName: "",
-    businessCountry: "",
-    businessType: "",
-    companyRegistrationNumber: "",
-    vatNumber: "",
-    tinNumber: "",
-    registeredBusinessAddress: {
-      address: "",
-      city: "",
-      postalCode: "",
-      country: "",
-    },
-  };
+      businessName: "",
+      businessCountry: "",
+      businessType: "",
+      companyRegistrationNumber: "",
+      vatNumber: "",
+      tinNumber: "",
+      registeredBusinessAddress: {
+        address: "",
+        city: "",
+        postalCode: "",
+        country: "",
+      },
+    };
 
   @state()
   private _businessActivity: BusinessActivity = {
-    website: "",
-    industry: "",
-    explainProducts: "",
-    deliveryTime: "",
-    estimatedMonthlyRevenue: "",
-  };
+      website: "",
+      industry: "",
+      explainProducts: "",
+      deliveryTime: "",
+      estimatedMonthlyRevenue: "",
+    };
 
   @property({ type: String })
   public apiKey = "";
+
   @property({ type: String })
   public apiSecret = "";
+
   @property({ type: String })
   public baseUrl = "";
 
@@ -81,7 +83,7 @@ export class BusinessInformation extends OnboardingStep {
       this._apiService = new ApiService(
         this.apiKey,
         this.apiSecret,
-        this.baseUrl
+        this.baseUrl,
       );
       this.requestUpdate("_apiService");
     }
@@ -102,11 +104,11 @@ export class BusinessInformation extends OnboardingStep {
     try {
       await this._apiService.saveLegalData(
         LegalEntitySection.BUSINESS_DETAILS,
-        this._businessDetails
+        this._businessDetails,
       );
       await this._apiService.saveLegalData(
         LegalEntitySection.BUSINESS_ACTIVITY,
-        this._businessActivity
+        this._businessActivity,
       );
       this.dispatchEvent(
         new CustomEvent("step-saved", {
@@ -116,10 +118,10 @@ export class BusinessInformation extends OnboardingStep {
             businessDetails: this._businessDetails,
             businessActivity: this._businessActivity,
           },
-        })
+        }),
       );
     } catch (error) {
-      console.error("Failed to save data", error);
+      console.debug("Failed to save data", error);
     } finally {
       this._isLoading = false;
       this._loadingSubtext = "";
@@ -129,15 +131,15 @@ export class BusinessInformation extends OnboardingStep {
   private async _handleBusinessDetailsInput(
     e: Event,
     field: keyof BusinessDetails,
-    subField?: keyof BusinessDetails["registeredBusinessAddress"]
+    subField?: keyof BusinessDetails["registeredBusinessAddress"],
   ) {
     e.preventDefault();
     const target = e.target as HTMLInputElement;
-    const value = target.value;
+    const { value } = target;
     if (
-      field === "registeredBusinessAddress" &&
-      subField &&
-      this._businessDetails[field][subField]
+      field === "registeredBusinessAddress"
+      && subField
+      && this._businessDetails[field][subField]
     ) {
       this._businessDetails[field][subField] = value;
     } else if (field !== "registeredBusinessAddress") {
@@ -150,19 +152,20 @@ export class BusinessInformation extends OnboardingStep {
 
   private async _handleBusinessActivityInput(
     e: Event,
-    field: keyof BusinessActivity
+    field: keyof BusinessActivity,
   ) {
     e.preventDefault();
     const target = e.target as HTMLInputElement;
-    const value = target.value;
+    const { value } = target;
     this._businessActivity[field] = value;
     this.requestUpdate("_businessActivity");
   }
 
   private async _handleSuggestionClick(suggestion: string) {
-    this._businessDetails.businessName = suggestion.split(" - ")[0];
-    this._businessDetails.companyRegistrationNumber =
-      suggestion.split(" - ")[1];
+    [
+      this._businessDetails.businessName,
+      this._businessDetails.companyRegistrationNumber,
+    ] = suggestion.split(" - ");
     this._getBusinessRegistersData();
     this._showSuggestions = false;
     this.requestUpdate("_businessDetails");
@@ -171,7 +174,7 @@ export class BusinessInformation extends OnboardingStep {
 
   private async _searchBusiness(businessName: string) {
     this._businessSuggestions = await this._apiService.searchBusiness(
-      businessName
+      businessName,
     );
     this.requestUpdate("_businessSuggestions");
   }
@@ -180,12 +183,12 @@ export class BusinessInformation extends OnboardingStep {
     this._isLoading = true;
     this._loadingSubtext = "Fetching company data...";
     if (
-      this._businessDetails.businessCountry &&
-      this._businessDetails.companyRegistrationNumber
+      this._businessDetails.businessCountry
+      && this._businessDetails.companyRegistrationNumber
     ) {
       const data = await this._apiService.getBusinessRegistersData(
         this._businessDetails.businessCountry,
-        this._businessDetails.companyRegistrationNumber
+        this._businessDetails.companyRegistrationNumber,
       );
       this._businessDetails = data.businessDetails;
       this._businessActivity = data.businessActivity;
@@ -202,8 +205,8 @@ export class BusinessInformation extends OnboardingStep {
     this._validationErrors = {};
 
     const requiredBusinessDetails: (keyof Omit<
-      BusinessDetails,
-      "registeredBusinessAddress" | "businessTradeName"
+    BusinessDetails,
+    "registeredBusinessAddress" | "businessTradeName"
     >)[] = [
       "businessName",
       "businessCountry",
@@ -213,12 +216,11 @@ export class BusinessInformation extends OnboardingStep {
       "tinNumber",
     ];
 
-    const requiredAddressDetails: (keyof BusinessDetails["registeredBusinessAddress"])[] =
-      ["address", "city", "postalCode", "country"];
+    const requiredAddressDetails: (keyof BusinessDetails["registeredBusinessAddress"])[] = ["address", "city", "postalCode", "country"];
 
     const requiredActivityDetails: (keyof Omit<
-      BusinessActivity,
-      "deliveryTime"
+    BusinessActivity,
+    "deliveryTime"
     >)[] = [
       "website",
       "industry",
@@ -226,23 +228,23 @@ export class BusinessInformation extends OnboardingStep {
       "estimatedMonthlyRevenue",
     ];
 
-    for (const field of requiredBusinessDetails) {
+    requiredBusinessDetails.forEach((field) => {
       if (!this._businessDetails[field]) {
         this._validationErrors[field] = true;
       }
-    }
+    });
 
-    for (const field of requiredAddressDetails) {
+    requiredAddressDetails.forEach((field) => {
       if (!this._businessDetails.registeredBusinessAddress[field]) {
         this._validationErrors[`registeredBusinessAddress.${field}`] = true;
       }
-    }
+    });
 
-    for (const field of requiredActivityDetails) {
+    requiredActivityDetails.forEach((field) => {
       if (!this._businessActivity[field]) {
         this._validationErrors[field] = true;
       }
-    }
+    });
 
     this.requestUpdate("_validationErrors");
     return Object.keys(this._validationErrors).length === 0;
@@ -259,55 +261,43 @@ export class BusinessInformation extends OnboardingStep {
               id="businessCountry"
               name="businessCountry"
               .value=${this._businessDetails.businessCountry || ""}
-              @input=${(e: Event) =>
-                this._handleBusinessDetailsInput(e, "businessCountry")}
+              @input=${(e: Event) => this._handleBusinessDetailsInput(e, "businessCountry")}
               required
               ?disabled=${this._businessDataFetchedFromRegisters}
             />
             ${this._validationErrors.businessCountry
-              ? html`<span class="error-message">
+    ? html`<span class="error-message">
                   Business country is required
                 </span>`
-              : ""}
+    : ""}
           </div>
           <div class="form-field">
-            <label for="businessName">Company Name</label>
+            <label for="business-name">Business Name</label>
             <input
+              id="business-name"
               type="text"
-              id="businessName"
-              name="businessName"
               .value=${this._businessDetails.businessName}
               @input=${(e: Event) => {
-                this._handleBusinessDetailsInput(e, "businessName");
-                this._searchBusiness((e.target as HTMLInputElement).value);
-                this._showSuggestions = true;
-              }}
+    this._handleBusinessDetailsInput(e, "businessName");
+    this._searchBusiness((e.target as HTMLInputElement).value);
+    this._showSuggestions = true;
+  }}
               required
-              ?disabled=${!this._businessDetails.businessCountry ||
-              this._businessDataFetchedFromRegisters}
+              class=${this._validationErrors.businessName ? "invalid" : ""}
             />
             ${this._showSuggestions && this._businessSuggestions.length > 0
-              ? html`
-                  <ul class="suggestions-list">
-                    ${this._businessSuggestions.map(
-                      (suggestion) =>
-                        html`
-                          <li
-                            @click=${() =>
-                              this._handleSuggestionClick(suggestion)}
-                          >
-                            ${suggestion}
-                          </li>
-                        `
-                    )}
-                  </ul>
-                `
-              : ""}
-            ${this._validationErrors.businessName
-              ? html`<span class="error-message">
-                  Business name is required
-                </span>`
-              : ""}
+    ? html`
+                <ul class="suggestions-list">
+                  ${this._businessSuggestions.map(
+    (suggestion) => html`
+                      <li @click=${() => this._handleSuggestionClick(suggestion)}>
+                        ${suggestion}
+                      </li>
+                    `,
+  )}
+                </ul>
+              `
+    : ""}
           </div>
           <div class="form-field">
             <label for="companyRegistrationNumber"
@@ -318,19 +308,18 @@ export class BusinessInformation extends OnboardingStep {
               id="companyRegistrationNumber"
               name="companyRegistrationNumber"
               .value=${this._businessDetails.companyRegistrationNumber || ""}
-              @input=${(e: Event) =>
-                this._handleBusinessDetailsInput(
-                  e,
-                  "companyRegistrationNumber"
-                )}
+              @input=${(e: Event) => this._handleBusinessDetailsInput(
+    e,
+    "companyRegistrationNumber",
+  )}
               required
               ?disabled=${this._businessDataFetchedFromRegisters}
             />
             ${this._validationErrors.companyRegistrationNumber
-              ? html`<span class="error-message">
+    ? html`<span class="error-message">
                   Company registration number is required
                 </span>`
-              : ""}
+    : ""}
           </div>
         </div>
 
@@ -340,17 +329,17 @@ export class BusinessInformation extends OnboardingStep {
               type="button"
               @click=${() => this._getBusinessRegistersData()}
               class="confirm-button"
-              ?disabled=${!this._businessDetails.businessCountry ||
-              !this._businessDetails.companyRegistrationNumber}
+              ?disabled=${!this._businessDetails.businessCountry
+              || !this._businessDetails.companyRegistrationNumber}
             >
               Search Company Data
             </button>
             <button
               type="button"
               class="confirm-button secondary-button"
-              @click=${() => (this._businessDataManualInput = true)}
-              ?disabled=${!this._businessDetails.businessCountry ||
-              !this._businessDetails.businessName}
+              @click=${() => { this._businessDataManualInput = true; }}
+              ?disabled=${!this._businessDetails.businessCountry
+              || !this._businessDetails.businessName}
             >
               Enter Manually
             </button>
@@ -371,12 +360,11 @@ export class BusinessInformation extends OnboardingStep {
               id="registeredBusinessAddress.address"
               name="registeredBusinessAddress.address"
               .value=${this._businessDetails.registeredBusinessAddress.address}
-              @input=${(e: Event) =>
-                this._handleBusinessDetailsInput(
-                  e,
-                  "registeredBusinessAddress",
-                  "address"
-                )}
+              @input=${(e: Event) => this._handleBusinessDetailsInput(
+    e,
+    "registeredBusinessAddress",
+    "address",
+  )}
               required
             />
           </div>
@@ -389,12 +377,11 @@ export class BusinessInformation extends OnboardingStep {
               id="registeredBusinessAddress.city"
               name="registeredBusinessAddress.city"
               .value=${this._businessDetails.registeredBusinessAddress.city}
-              @input=${(e: Event) =>
-                this._handleBusinessDetailsInput(
-                  e,
-                  "registeredBusinessAddress",
-                  "city"
-                )}
+              @input=${(e: Event) => this._handleBusinessDetailsInput(
+    e,
+    "registeredBusinessAddress",
+    "city",
+  )}
               required
             />
           </div>
@@ -407,13 +394,12 @@ export class BusinessInformation extends OnboardingStep {
               id="registeredBusinessAddress.postalCode"
               name="registeredBusinessAddress.postalCode"
               .value=${this._businessDetails.registeredBusinessAddress
-                .postalCode}
-              @input=${(e: Event) =>
-                this._handleBusinessDetailsInput(
-                  e,
-                  "registeredBusinessAddress",
-                  "postalCode"
-                )}
+    .postalCode}
+              @input=${(e: Event) => this._handleBusinessDetailsInput(
+    e,
+    "registeredBusinessAddress",
+    "postalCode",
+  )}
               required
             />
           </div>
@@ -424,12 +410,11 @@ export class BusinessInformation extends OnboardingStep {
               id="registeredBusinessAddress.country"
               name="registeredBusinessAddress.country"
               .value=${this._businessDetails.registeredBusinessAddress.country}
-              @input=${(e: Event) =>
-                this._handleBusinessDetailsInput(
-                  e,
-                  "registeredBusinessAddress",
-                  "country"
-                )}
+              @input=${(e: Event) => this._handleBusinessDetailsInput(
+    e,
+    "registeredBusinessAddress",
+    "country",
+  )}
               required
             />
           </div>
@@ -449,15 +434,14 @@ export class BusinessInformation extends OnboardingStep {
               id="website"
               name="website"
               .value=${this._businessActivity.website || ""}
-              @input=${(e: Event) =>
-                this._handleBusinessActivityInput(e, "website")}
+              @input=${(e: Event) => this._handleBusinessActivityInput(e, "website")}
               required
             />
             ${this._validationErrors.website
-              ? html`<div class="error-message">
+    ? html`<div class="error-message">
                   ${this._validationErrors.website}
                 </div>`
-              : ""}
+    : ""}
           </div>
           <div class="form-field">
             <label for="industry">Industry</label>
@@ -466,13 +450,12 @@ export class BusinessInformation extends OnboardingStep {
               id="industry"
               name="industry"
               .value=${this._businessActivity.industry || ""}
-              @input=${(e: Event) =>
-                this._handleBusinessActivityInput(e, "industry")}
+              @input=${(e: Event) => this._handleBusinessActivityInput(e, "industry")}
               required
             />
             ${this._validationErrors.industry
-              ? html`<span class="error-message"> Industry is required </span>`
-              : ""}
+    ? html`<span class="error-message"> Industry is required </span>`
+    : ""}
           </div>
         </div>
         <div class="row">
@@ -482,15 +465,14 @@ export class BusinessInformation extends OnboardingStep {
               id="explainProducts"
               name="explainProducts"
               .value=${this._businessActivity.explainProducts || ""}
-              @input=${(e: Event) =>
-                this._handleBusinessActivityInput(e, "explainProducts")}
+              @input=${(e: Event) => this._handleBusinessActivityInput(e, "explainProducts")}
               required
             ></textarea>
             ${this._validationErrors.explainProducts
-              ? html`<span class="error-message">
+    ? html`<span class="error-message">
                   Explain your products is required
                 </span>`
-              : ""}
+    : ""}
           </div>
         </div>
         <div class="row">
@@ -501,8 +483,7 @@ export class BusinessInformation extends OnboardingStep {
               id="deliveryTime"
               name="deliveryTime"
               .value=${this._businessActivity.deliveryTime || ""}
-              @input=${(e: Event) =>
-                this._handleBusinessActivityInput(e, "deliveryTime")}
+              @input=${(e: Event) => this._handleBusinessActivityInput(e, "deliveryTime")}
             />
           </div>
           <div class="form-field">
@@ -514,15 +495,14 @@ export class BusinessInformation extends OnboardingStep {
               id="estimatedMonthlyRevenue"
               name="estimatedMonthlyRevenue"
               .value=${this._businessActivity.estimatedMonthlyRevenue || ""}
-              @input=${(e: Event) =>
-                this._handleBusinessActivityInput(e, "estimatedMonthlyRevenue")}
+              @input=${(e: Event) => this._handleBusinessActivityInput(e, "estimatedMonthlyRevenue")}
               required
             />
             ${this._validationErrors.estimatedMonthlyRevenue
-              ? html`<span class="error-message">
+    ? html`<span class="error-message">
                   Estimated monthly revenue is required
                 </span>`
-              : ""}
+    : ""}
           </div>
         </div>
       </div>
@@ -533,18 +513,18 @@ export class BusinessInformation extends OnboardingStep {
     return html`
       <div style="position: relative;">
         ${this._isLoading
-          ? html`
+    ? html`
               <div class="loading-overlay">
                 <div class="loader"></div>
                 <div class="loader-subtext">${this._loadingSubtext}</div>
               </div>
             `
-          : ""}
+    : ""}
         <form>
           <div
             class="form-section ${this._businessDataFetchedFromRegisters
-              ? "disabled-section"
-              : ""}"
+    ? "disabled-section"
+    : ""}"
           >
             <h3>Business Information</h3>
             <p>
@@ -554,16 +534,16 @@ export class BusinessInformation extends OnboardingStep {
             ${this._renderBusinessDetailsForm()}
           </div>
 
-          ${this._businessDataFetchedFromRegisters ||
-          this._businessDataManualInput
-            ? html`<div class="form-section">
+          ${this._businessDataFetchedFromRegisters
+          || this._businessDataManualInput
+    ? html`<div class="form-section">
                 <h3>Registered Address</h3>
                 ${this._renderBusinessRegisteredAddress()}
               </div>`
-            : ""}
-          ${this._businessDataFetchedFromRegisters ||
-          this._businessDataManualInput
-            ? html`<div class="form-section">
+    : ""}
+          ${this._businessDataFetchedFromRegisters
+          || this._businessDataManualInput
+    ? html`<div class="form-section">
                 <h3>Business Activity</h3>
                 <p>
                   Tell us more about what your business does. This helps us
@@ -571,7 +551,7 @@ export class BusinessInformation extends OnboardingStep {
                 </p>
                 ${this._renderBusinessActivity()}
               </div>`
-            : ""}
+    : ""}
         </form>
       </div>
     `;

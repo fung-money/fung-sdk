@@ -15,7 +15,7 @@ export const commonStyles = css`
   }
 
   .form-section {
-    background-color: var(--input-background, #fff);
+    background-color: var(--background-color, #fff);
     border: 1px solid var(--border-color, #ced4da);
     border-radius: var(--form-section-border-radius, 8px);
     padding: var(--form-section-padding, 1.5rem);
@@ -217,7 +217,7 @@ export const commonStyles = css`
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: var(--background-color, #f8f9fa);
+    background-color: var(--input-background, #f8f9fa);
     padding: 1rem;
     border-radius: 4px;
     border: 1px solid var(--border-color, #ced4da);
@@ -244,7 +244,7 @@ export const commonStyles = css`
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem;
-    background-color: var(--background-color, #f8f9fa);
+    background-color: var(--input-background, #f8f9fa);
     border: 1px solid var(--border-color, #ced4da);
     border-radius: 4px;
   }

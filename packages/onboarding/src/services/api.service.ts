@@ -8,7 +8,7 @@ export class ApiService {
   constructor(
     private readonly apiKey: string,
     private readonly apiSecret: string,
-    private readonly baseUrl: string
+    private readonly baseUrl: string,
   ) {
     if (!apiKey) {
       throw new Error("API key is required to use the ApiService.");
@@ -20,38 +20,34 @@ export class ApiService {
       throw new Error("Base URL is required to use the ApiService.");
     }
 
-    console.log("ApiService initialized");
+    console.debug("ApiService initialized");
   }
 
   public async saveLegalData(
     type: LegalEntitySection,
     data:
-      | BusinessDetails
-      | BusinessActivity
-      | BusinessRepresentative
-      | BusinessOwners
+    | BusinessDetails
+    | BusinessActivity
+    | BusinessRepresentative
+    | BusinessOwners,
   ): Promise<void> {
-    console.log(`Submitting section ${type} with data:`, data);
-
+    console.debug(`Submitting section ${type} with data:`, data);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    return Promise.resolve();
   }
 
   public async getBusinessRegistersData(
     country: string,
-    businessRegistrationNumber: string
+    businessRegistrationNumber: string,
   ): Promise<{
-    businessDetails: BusinessDetails;
-    businessActivity: BusinessActivity;
-  }> {
-    console.log(
-      `Looking up company ${businessRegistrationNumber} in ${country}...`
+      businessDetails: BusinessDetails;
+      businessActivity: BusinessActivity;
+    }> {
+    console.debug(
+      `Looking up company ${businessRegistrationNumber} in ${country}...`,
     );
-
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    return Promise.resolve({
+    return {
       businessDetails: {
         businessName: "Test Company",
         businessCountry: "United Kingdom",
@@ -73,19 +69,18 @@ export class ApiService {
         deliveryTime: "1 week",
         estimatedMonthlyRevenue: "100000",
       },
-    });
+    };
   }
 
   public async searchBusiness(partialBusinessName: string): Promise<string[]> {
-    console.log(
-      `Searching for companies with partial name: ${partialBusinessName}`
+    console.debug(
+      `Searching for companies with partial name: ${partialBusinessName}`,
     );
-
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    return Promise.resolve([
+    return [
       "Test Company - 123123123",
       "Test Company 2 - 123123123",
-    ]);
+    ];
   }
 }

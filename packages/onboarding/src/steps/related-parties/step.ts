@@ -13,21 +13,28 @@ export class RelatedParties extends OnboardingStep {
 
   @state()
   private _businessRepresentative: BusinessRepresentative = {
-    legalName: { firstName: "", lastName: "" },
-    emailAddress: "",
-    contactNumber: "",
-    dateOfBirth: "",
-    jobTitle: "",
-    homeAddress: { address: "", city: "", postalCode: "", country: "" },
-  };
+      legalName: { firstName: "", lastName: "" },
+      emailAddress: "",
+      contactNumber: "",
+      dateOfBirth: "",
+      jobTitle: "",
+      homeAddress: {
+        address: "",
+        city: "",
+        postalCode: "",
+        country: "",
+      },
+    };
 
   @state()
   private _businessOwners: BusinessOwner[] = [];
 
   @property({ type: String })
   public apiKey = "";
+
   @property({ type: String })
   public apiSecret = "";
+
   @property({ type: String })
   public baseUrl = "";
 
@@ -36,6 +43,7 @@ export class RelatedParties extends OnboardingStep {
 
   @state()
   private _isLoading = false;
+
   @state()
   private _loadingSubtext = "";
 
@@ -57,17 +65,17 @@ export class RelatedParties extends OnboardingStep {
     businessOwners: Partial<BusinessOwner>[];
     representativeOwnership?: string;
   } = {
-    businessRepresentative: {},
-    businessOwners: [],
-    representativeOwnership: "",
-  };
+        businessRepresentative: {},
+        businessOwners: [],
+        representativeOwnership: "",
+      };
 
   updated() {
     if (this.apiKey && this.apiSecret && this.baseUrl && !this._apiService) {
       this._apiService = new ApiService(
         this.apiKey,
         this.apiSecret,
-        this.baseUrl
+        this.baseUrl,
       );
       this.requestUpdate("_apiService");
     }
@@ -87,7 +95,7 @@ export class RelatedParties extends OnboardingStep {
           bubbles: true,
           composed: true,
           detail: { message: "Please correct the errors before proceeding." },
-        })
+        }),
       );
       return;
     }
@@ -98,33 +106,33 @@ export class RelatedParties extends OnboardingStep {
     try {
       await this._apiService.saveLegalData(
         LegalEntitySection.BUSINESS_REPRESENTATIVE,
-        this._businessRepresentative
+        this._businessRepresentative,
       );
 
       await this._apiService.saveLegalData(
         LegalEntitySection.BUSINESS_OWNERS,
         this._isRepresentativeABusinessOwner
           ? {
-              businessOwners: [
-                ...this._businessOwners,
-                {
-                  ...this._businessRepresentative,
-                  percentOwnership: this._businessRepresentativeOwnership,
-                },
-              ],
-            }
+            businessOwners: [
+              ...this._businessOwners,
+              {
+                ...this._businessRepresentative,
+                percentOwnership: this._businessRepresentativeOwnership,
+              },
+            ],
+          }
           : {
-              businessOwners: [...this._businessOwners],
-            }
+            businessOwners: [...this._businessOwners],
+          },
       );
     } catch (error) {
-      console.error("Error saving Related Parties Data:", error);
+      console.debug("Error saving Related Parties Data:", error);
       this.dispatchEvent(
         new CustomEvent("save-error", {
           bubbles: true,
           composed: true,
           detail: { message: "Failed to save data. Please try again." },
-        })
+        }),
       );
     } finally {
       this._isLoading = false;
@@ -141,7 +149,7 @@ export class RelatedParties extends OnboardingStep {
             ? [...this._businessOwners, this._businessRepresentative]
             : this._businessOwners,
         },
-      })
+      }),
     );
   }
 
@@ -253,11 +261,10 @@ export class RelatedParties extends OnboardingStep {
 
     if (this._isRepresentativeABusinessOwner) {
       if (
-        this._businessRepresentativeOwnership <= 0 ||
-        this._businessRepresentativeOwnership > 100
+        this._businessRepresentativeOwnership <= 0
+        || this._businessRepresentativeOwnership > 100
       ) {
-        newErrors.representativeOwnership =
-          "Ownership must be between 1 and 100.";
+        newErrors.representativeOwnership = "Ownership must be between 1 and 100.";
         hasError = true;
       }
     }
@@ -270,8 +277,8 @@ export class RelatedParties extends OnboardingStep {
     e: Event,
     field: keyof BusinessRepresentative,
     subField?:
-      | keyof BusinessRepresentative["legalName"]
-      | keyof BusinessRepresentative["homeAddress"]
+    | keyof BusinessRepresentative["legalName"]
+    | keyof BusinessRepresentative["homeAddress"],
   ) {
     const target = e?.target as HTMLInputElement;
     const value = target?.value;
@@ -291,8 +298,8 @@ export class RelatedParties extends OnboardingStep {
     index: number,
     field: keyof BusinessOwner,
     subField?:
-      | keyof BusinessOwner["legalName"]
-      | keyof BusinessOwner["homeAddress"]
+    | keyof BusinessOwner["legalName"]
+    | keyof BusinessOwner["homeAddress"],
   ) {
     const target = e?.target as HTMLInputElement;
     const value = target?.value;
@@ -325,7 +332,12 @@ export class RelatedParties extends OnboardingStep {
       contactNumber: "",
       jobTitle: "",
       dateOfBirth: "",
-      homeAddress: { address: "", city: "", postalCode: "", country: "" },
+      homeAddress: {
+        address: "",
+        city: "",
+        postalCode: "",
+        country: "",
+      },
       percentOwnership: 0,
     });
     this._collapseStateByIndex[this._businessOwners.length - 1] = false;
@@ -334,7 +346,7 @@ export class RelatedParties extends OnboardingStep {
 
   private _removeBusinessOwner(ownerToRemove: BusinessOwner) {
     this._businessOwners = this._businessOwners.filter(
-      (owner) => owner !== ownerToRemove
+      (owner) => owner !== ownerToRemove,
     );
     this.requestUpdate("_businessOwners");
   }
@@ -362,10 +374,9 @@ export class RelatedParties extends OnboardingStep {
         <div
           class="collapsible-header"
           @click=${() => {
-            this._isBusinessRepresentativeCollapsed =
-              !this._isBusinessRepresentativeCollapsed;
-            this.requestUpdate("_isBusinessRepresentativeCollapsed");
-          }}
+    this._isBusinessRepresentativeCollapsed = !this._isBusinessRepresentativeCollapsed;
+    this.requestUpdate("_isBusinessRepresentativeCollapsed");
+  }}
         >
           <h3>Business Representative</h3>
           <span class="icon"
@@ -373,7 +384,7 @@ export class RelatedParties extends OnboardingStep {
           >
         </div>
         ${this._isBusinessRepresentativeCollapsed
-          ? html`
+    ? html`
               <p>
                 Please provide details for the person who will act as the
                 primary contact for this account.
@@ -385,20 +396,19 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-firstName"
                     type="text"
                     class=${this._errors.businessRepresentative?.legalName
-                      ?.firstName
-                      ? "invalid"
-                      : ""}
+    ?.firstName
+    ? "invalid"
+    : ""}
                     .value=${this._businessRepresentative.legalName.firstName}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(
-                        e,
-                        "legalName",
-                        "firstName"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(
+    e,
+    "legalName",
+    "firstName",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessRepresentative?.legalName?.firstName
-                  )}
+    this._errors.businessRepresentative?.legalName?.firstName,
+  )}
                 </div>
                 <div class="form-field">
                   <label for="rep-lastName">Last Name</label>
@@ -406,20 +416,19 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-lastName"
                     type="text"
                     class=${this._errors.businessRepresentative?.legalName
-                      ?.lastName
-                      ? "invalid"
-                      : ""}
+    ?.lastName
+    ? "invalid"
+    : ""}
                     .value=${this._businessRepresentative.legalName.lastName}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(
-                        e,
-                        "legalName",
-                        "lastName"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(
+    e,
+    "legalName",
+    "lastName",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessRepresentative?.legalName?.lastName
-                  )}
+    this._errors.businessRepresentative?.legalName?.lastName,
+  )}
                 </div>
                 <div class="form-field">
                   <label for="rep-email">Email Address</label>
@@ -427,18 +436,17 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-email"
                     type="email"
                     class=${this._errors.businessRepresentative?.emailAddress
-                      ? "invalid"
-                      : ""}
+    ? "invalid"
+    : ""}
                     .value=${this._businessRepresentative.emailAddress}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(
-                        e,
-                        "emailAddress"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(
+    e,
+    "emailAddress",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessRepresentative?.emailAddress
-                  )}
+    this._errors.businessRepresentative?.emailAddress,
+  )}
                 </div>
                 <div class="form-field">
                   <label for="rep-dob">Date of Birth</label>
@@ -446,15 +454,14 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-dob"
                     type="date"
                     class=${this._errors.businessRepresentative?.dateOfBirth
-                      ? "invalid"
-                      : ""}
+    ? "invalid"
+    : ""}
                     .value=${this._businessRepresentative.dateOfBirth}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(e, "dateOfBirth")}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(e, "dateOfBirth")}
                   />
                   ${this._renderError(
-                    this._errors.businessRepresentative?.dateOfBirth
-                  )}
+    this._errors.businessRepresentative?.dateOfBirth,
+  )}
                 </div>
                 <div class="form-field">
                   <label for="rep-jobTitle">Job Title</label>
@@ -462,8 +469,7 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-jobTitle"
                     type="text"
                     .value=${this._businessRepresentative.jobTitle}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(e, "jobTitle")}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(e, "jobTitle")}
                   />
                 </div>
                 <div class="form-field">
@@ -472,11 +478,10 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-contactNumber"
                     type="tel"
                     .value=${this._businessRepresentative.contactNumber}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(
-                        e,
-                        "contactNumber"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(
+    e,
+    "contactNumber",
+  )}
                   />
                 </div>
               </div>
@@ -488,20 +493,19 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-address"
                     type="text"
                     class=${this._errors.businessRepresentative?.homeAddress
-                      ?.address
-                      ? "invalid"
-                      : ""}
+    ?.address
+    ? "invalid"
+    : ""}
                     .value=${this._businessRepresentative.homeAddress.address}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(
-                        e,
-                        "homeAddress",
-                        "address"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(
+    e,
+    "homeAddress",
+    "address",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessRepresentative?.homeAddress?.address
-                  )}
+    this._errors.businessRepresentative?.homeAddress?.address,
+  )}
                 </div>
                 <div class="form-field">
                   <label for="rep-city">City</label>
@@ -509,20 +513,19 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-city"
                     type="text"
                     class=${this._errors.businessRepresentative?.homeAddress
-                      ?.city
-                      ? "invalid"
-                      : ""}
+    ?.city
+    ? "invalid"
+    : ""}
                     .value=${this._businessRepresentative.homeAddress.city}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(
-                        e,
-                        "homeAddress",
-                        "city"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(
+    e,
+    "homeAddress",
+    "city",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessRepresentative?.homeAddress?.city
-                  )}
+    this._errors.businessRepresentative?.homeAddress?.city,
+  )}
                 </div>
                 <div class="form-field">
                   <label for="rep-postalCode">Postal Code</label>
@@ -530,21 +533,20 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-postalCode"
                     type="text"
                     class=${this._errors.businessRepresentative?.homeAddress
-                      ?.postalCode
-                      ? "invalid"
-                      : ""}
+    ?.postalCode
+    ? "invalid"
+    : ""}
                     .value=${this._businessRepresentative.homeAddress
-                      .postalCode}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(
-                        e,
-                        "homeAddress",
-                        "postalCode"
-                      )}
+    .postalCode}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(
+    e,
+    "homeAddress",
+    "postalCode",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessRepresentative?.homeAddress?.postalCode
-                  )}
+    this._errors.businessRepresentative?.homeAddress?.postalCode,
+  )}
                 </div>
                 <div class="form-field">
                   <label for="rep-country">Country</label>
@@ -552,24 +554,23 @@ export class RelatedParties extends OnboardingStep {
                     id="rep-country"
                     type="text"
                     class=${this._errors.businessRepresentative?.homeAddress
-                      ?.country
-                      ? "invalid"
-                      : ""}
+    ?.country
+    ? "invalid"
+    : ""}
                     .value=${this._businessRepresentative.homeAddress.country}
-                    @input=${(e: Event) =>
-                      this._handleBusinessRepresentativeInput(
-                        e,
-                        "homeAddress",
-                        "country"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessRepresentativeInput(
+    e,
+    "homeAddress",
+    "country",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessRepresentative?.homeAddress?.country
-                  )}
+    this._errors.businessRepresentative?.homeAddress?.country,
+  )}
                 </div>
               </div>
             `
-          : nothing}
+    : nothing}
       </div>
     `;
   }
@@ -584,8 +585,8 @@ export class RelatedParties extends OnboardingStep {
           <h3>
             Business Owner:
             ${owner.legalName.firstName || owner.legalName.lastName
-              ? `${owner.legalName.firstName} ${owner.legalName.lastName}`
-              : `(new owner)`}
+    ? `${owner.legalName.firstName} ${owner.legalName.lastName}`
+    : "(new owner)"}
             (${owner.percentOwnership}% ownership)
           </h3>
           <span class="icon"
@@ -593,87 +594,82 @@ export class RelatedParties extends OnboardingStep {
           >
         </div>
         ${!this._collapseStateByIndex[index]
-          ? html`
+    ? html`
               <div class="form-grid">
                 <div class="form-field">
                   <label>First Name</label>
                   <input
                     type="text"
                     class=${this._errors.businessOwners[index]?.legalName
-                      ?.firstName
-                      ? "invalid"
-                      : ""}
+    ?.firstName
+    ? "invalid"
+    : ""}
                     .value=${owner.legalName.firstName}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(
-                        e,
-                        index,
-                        "legalName",
-                        "firstName"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(
+    e,
+    index,
+    "legalName",
+    "firstName",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessOwners[index]?.legalName?.firstName
-                  )}
+    this._errors.businessOwners[index]?.legalName?.firstName,
+  )}
                 </div>
                 <div class="form-field">
                   <label>Last Name</label>
                   <input
                     type="text"
                     class=${this._errors.businessOwners[index]?.legalName
-                      ?.lastName
-                      ? "invalid"
-                      : ""}
+    ?.lastName
+    ? "invalid"
+    : ""}
                     .value=${owner.legalName.lastName}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(
-                        e,
-                        index,
-                        "legalName",
-                        "lastName"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(
+    e,
+    index,
+    "legalName",
+    "lastName",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessOwners[index]?.legalName?.lastName
-                  )}
+    this._errors.businessOwners[index]?.legalName?.lastName,
+  )}
                 </div>
                 <div class="form-field">
                   <label>Email Address</label>
                   <input
                     type="email"
                     class=${this._errors.businessOwners[index]?.emailAddress
-                      ? "invalid"
-                      : ""}
+    ? "invalid"
+    : ""}
                     .value=${owner.emailAddress}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(e, index, "emailAddress")}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(e, index, "emailAddress")}
                   />
                   ${this._renderError(
-                    this._errors.businessOwners[index]?.emailAddress
-                  )}
+    this._errors.businessOwners[index]?.emailAddress,
+  )}
                 </div>
                 <div class="form-field">
                   <label>Date of Birth</label>
                   <input
                     type="date"
                     class=${this._errors.businessOwners[index]?.dateOfBirth
-                      ? "invalid"
-                      : ""}
+    ? "invalid"
+    : ""}
                     .value=${owner.dateOfBirth}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(e, index, "dateOfBirth")}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(e, index, "dateOfBirth")}
                   />
                   ${this._renderError(
-                    this._errors.businessOwners[index]?.dateOfBirth
-                  )}
+    this._errors.businessOwners[index]?.dateOfBirth,
+  )}
                 </div>
                 <div class="form-field">
                   <label>Job Title</label>
                   <input
                     type="text"
                     .value=${owner.jobTitle}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(e, index, "jobTitle")}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(e, index, "jobTitle")}
                   />
                 </div>
                 <div class="form-field">
@@ -681,8 +677,7 @@ export class RelatedParties extends OnboardingStep {
                   <input
                     type="tel"
                     .value=${owner.contactNumber}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(e, index, "contactNumber")}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(e, index, "contactNumber")}
                   />
                 </div>
                 <div class="form-field">
@@ -692,21 +687,20 @@ export class RelatedParties extends OnboardingStep {
                     min="0"
                     max="100"
                     class=${this._errors.businessOwners[index]?.percentOwnership
-                      ? "invalid"
-                      : ""}
+    ? "invalid"
+    : ""}
                     .value=${owner.percentOwnership}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(
-                        e,
-                        index,
-                        "percentOwnership"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(
+    e,
+    index,
+    "percentOwnership",
+  )}
                   />
                   ${this._renderError(
-                    String(
-                      this._errors.businessOwners[index]?.percentOwnership || ""
-                    )
-                  )}
+    String(
+      this._errors.businessOwners[index]?.percentOwnership || "",
+    ),
+  )}
                 </div>
               </div>
               <h4 class="subsection-header">Home Address</h4>
@@ -716,84 +710,80 @@ export class RelatedParties extends OnboardingStep {
                   <input
                     type="text"
                     class=${this._errors.businessOwners[index]?.homeAddress
-                      ?.address
-                      ? "invalid"
-                      : ""}
+    ?.address
+    ? "invalid"
+    : ""}
                     .value=${owner.homeAddress.address}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(
-                        e,
-                        index,
-                        "homeAddress",
-                        "address"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(
+    e,
+    index,
+    "homeAddress",
+    "address",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessOwners[index]?.homeAddress?.address
-                  )}
+    this._errors.businessOwners[index]?.homeAddress?.address,
+  )}
                 </div>
                 <div class="form-field">
                   <label>City</label>
                   <input
                     type="text"
                     class=${this._errors.businessOwners[index]?.homeAddress
-                      ?.city
-                      ? "invalid"
-                      : ""}
+    ?.city
+    ? "invalid"
+    : ""}
                     .value=${owner.homeAddress.city}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(
-                        e,
-                        index,
-                        "homeAddress",
-                        "city"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(
+    e,
+    index,
+    "homeAddress",
+    "city",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessOwners[index]?.homeAddress?.city
-                  )}
+    this._errors.businessOwners[index]?.homeAddress?.city,
+  )}
                 </div>
                 <div class="form-field">
                   <label>Postal Code</label>
                   <input
                     type="text"
                     class=${this._errors.businessOwners[index]?.homeAddress
-                      ?.postalCode
-                      ? "invalid"
-                      : ""}
+    ?.postalCode
+    ? "invalid"
+    : ""}
                     .value=${owner.homeAddress.postalCode}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(
-                        e,
-                        index,
-                        "homeAddress",
-                        "postalCode"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(
+    e,
+    index,
+    "homeAddress",
+    "postalCode",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessOwners[index]?.homeAddress?.postalCode
-                  )}
+    this._errors.businessOwners[index]?.homeAddress?.postalCode,
+  )}
                 </div>
                 <div class="form-field">
                   <label>Country</label>
                   <input
                     type="text"
                     class=${this._errors.businessOwners[index]?.homeAddress
-                      ?.country
-                      ? "invalid"
-                      : ""}
+    ?.country
+    ? "invalid"
+    : ""}
                     .value=${owner.homeAddress.country}
-                    @input=${(e: Event) =>
-                      this._handleBusinessOwnerInput(
-                        e,
-                        index,
-                        "homeAddress",
-                        "country"
-                      )}
+                    @input=${(e: Event) => this._handleBusinessOwnerInput(
+    e,
+    index,
+    "homeAddress",
+    "country",
+  )}
                   />
                   ${this._renderError(
-                    this._errors.businessOwners[index]?.homeAddress?.country
-                  )}
+    this._errors.businessOwners[index]?.homeAddress?.country,
+  )}
                 </div>
               </div>
               <div class="button-group" style="justify-content: flex-end;">
@@ -806,7 +796,7 @@ export class RelatedParties extends OnboardingStep {
                 </button>
               </div>
             `
-          : nothing}
+    : nothing}
       </div>
     `;
   }
@@ -815,13 +805,13 @@ export class RelatedParties extends OnboardingStep {
     return html`
       <div style="position: relative;">
         ${this._isLoading
-          ? html`
+    ? html`
               <div class="loading-overlay">
                 <div class="loader"></div>
                 <div class="loader-subtext">${this._loadingSubtext}</div>
               </div>
             `
-          : ""}
+    : ""}
 
         <form>
           ${this._renderBusinessRepresentative()}
@@ -832,19 +822,21 @@ export class RelatedParties extends OnboardingStep {
               Please list all individuals who own 25% or more of the company.
             </p>
             <div class="checkbox-field">
-              <input
-                type="checkbox"
-                id="is-representative-owner"
-                .checked=${this._isRepresentativeABusinessOwner}
-                @change=${this._handleIsRepresentativeABusinessOwnerChange}
-              />
-              <label for="is-representative-owner"
-                >The Business Representative is also a Business Owner.</label
+              <label for="is-rep-owner"
+                >Is the Business Representative also a Business Owner?</label
               >
+              <input
+                id="is-rep-owner"
+                type="checkbox"
+                .checked=${this._isRepresentativeABusinessOwner}
+                @change=${(e: Event) => {
+    this._handleIsRepresentativeABusinessOwnerChange(e);
+  }}
+              />
             </div>
 
             ${this._isRepresentativeABusinessOwner
-              ? html`
+    ? html`
                   <div
                     class="form-field"
                     style="max-width: 240px; margin-top: 1rem;"
@@ -858,23 +850,22 @@ export class RelatedParties extends OnboardingStep {
                       min="0"
                       max="100"
                       class=${this._errors.representativeOwnership
-                        ? "invalid"
-                        : ""}
+    ? "invalid"
+    : ""}
                       .value=${this._businessRepresentativeOwnership}
-                      @input=${(e: Event) =>
-                        (this._businessRepresentativeOwnership = Number(
-                          (e.target as HTMLInputElement).value
-                        ))}
+                      @input=${(e: Event) => {
+    this._businessRepresentativeOwnership = Number(
+      (e.target as HTMLInputElement).value,
+    );
+  }}
                     />
                     ${this._renderError(this._errors.representativeOwnership)}
                   </div>
                 `
-              : nothing}
+    : nothing}
           </div>
 
-          ${this._businessOwners.map((owner, index) =>
-            this._renderBusinessOwner(owner, index)
-          )}
+          ${this._businessOwners.map((owner, index) => this._renderBusinessOwner(owner, index))}
 
           <div class="button-group">
             <button

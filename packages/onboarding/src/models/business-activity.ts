@@ -4,4 +4,4 @@ export interface BusinessActivity {
   explainProducts: string;
   deliveryTime?: string;
   estimatedMonthlyRevenue: string;
-} 
+}

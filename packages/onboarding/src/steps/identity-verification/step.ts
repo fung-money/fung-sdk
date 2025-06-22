@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit";
+import { html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { OnboardingStep } from "../onboarding-step.js";
 import { commonStyles } from "../styles.js";
@@ -8,11 +8,10 @@ export class IdentityVerification extends OnboardingStep {
   static styles = [commonStyles];
 
   async saveData(): Promise<void> {
-    console.log("Saving Legal Data...");
+    console.debug("Saving Identity Verification Data...");
     this.dispatchEvent(
-      new CustomEvent("step-saved", { bubbles: true, composed: true })
+      new CustomEvent("step-saved", { bubbles: true, composed: true }),
     );
-    return;
   }
 
   render() {
@@ -23,7 +22,7 @@ export class IdentityVerification extends OnboardingStep {
   }
 
   async submit(): Promise<boolean> {
-    console.log("Submitting Identity Verification Step...");
+    console.debug("Submitting Identity Verification Step...");
     return true;
   }
 }
