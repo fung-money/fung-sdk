@@ -1,95 +1,216 @@
 import { html, nothing } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, state, property } from "lit/decorators.js";
 import { OnboardingStep } from "../onboarding-step.js";
 import { commonStyles } from "../styles.js";
 import type { BusinessDetails } from "../../models/business-details.js";
 import type { BusinessActivity } from "../../models/business-activity.js";
 import type { BusinessRepresentative } from "../../models/business-representative.js";
 import type { BusinessOwner } from "../../models/business-owners.js";
+import { ApiService } from "../../services/api.service.js";
 
 @customElement("application-summary")
 export class ApplicationSummary extends OnboardingStep {
   static styles = [commonStyles];
 
+  @property({ type: String })
+  public apiKey = "";
+
+  @property({ type: String })
+  public apiSecret = "";
+
+  @property({ type: String })
+  public baseUrl = "";
+
+  @property({ type: String })
+  public accountId = "";
+
+  @property({ type: Boolean })
+  public isMocked = false;
+
   @state()
   private _businessDetails: BusinessDetails = {
-      businessName: "Dummy Corp",
-      businessCountry: "Dummyland",
-      businessType: "LLC",
-      companyRegistrationNumber: "12345",
-      vatNumber: "DL123",
-      tinNumber: "DT123",
-      registeredBusinessAddress: {
-        address: "123 Dummy St",
-        city: "Dummytown",
-        postalCode: "12345",
-        country: "Dummyland",
-      },
-    };
+    businessName: "",
+    businessCountry: "",
+    businessType: "",
+    companyRegistrationNumber: "",
+    vatNumber: "",
+    tinNumber: "",
+    registeredBusinessAddress: {
+      address: "",
+      city: "",
+      postalCode: "",
+      country: "",
+    },
+  };
 
   @state()
   private _businessActivity: BusinessActivity = {
-      website: "https://dummy.com",
-      industry: "Dummies",
-      explainProducts: "We sell high-quality dummies.",
-      deliveryTime: "1-2 weeks",
-      estimatedMonthlyRevenue: "1,000,000",
-    };
+    website: "",
+    industry: "",
+    explainProducts: "",
+    estimatedMonthlyRevenue: "",
+  };
 
   @state()
   private _businessRepresentative: BusinessRepresentative = {
-      legalName: { firstName: "John", lastName: "Doe" },
-      emailAddress: "john.doe@dummy.com",
-      contactNumber: "555-1234",
-      dateOfBirth: "1990-01-01",
-      jobTitle: "Chief Dummy",
-      homeAddress: {
-        address: "456 Dummy Ave",
-        city: "Dummytown",
-        postalCode: "12345",
-        country: "Dummyland",
-      },
-    };
+    legalName: { firstName: "", lastName: "" },
+    emailAddress: "",
+    contactNumber: "",
+    dateOfBirth: "",
+    jobTitle: "",
+    homeAddress: {
+      address: "",
+      city: "",
+      postalCode: "",
+      country: "",
+    },
+  };
 
   @state()
-  private _businessOwners: BusinessOwner[] = [
-      {
-        legalName: { firstName: "Jane", lastName: "Doe" },
-        emailAddress: "jane.doe@dummy.com",
-        contactNumber: "555-5678",
-        jobTitle: "VP of Dummies",
-        dateOfBirth: "1992-02-02",
-        homeAddress: {
-          address: "789 Dummy Blvd",
-          city: "Dummytown",
-          postalCode: "12345",
-          country: "Dummyland",
-        },
-        percentOwnership: 50,
-      },
-    ];
+  private _businessOwners: BusinessOwner[] = [];
 
   @state()
   private _isRepresentativeOwner = true;
 
+  @state()
+  private _apiService!: ApiService;
+
+  @state()
+  private _isLoading = false;
+
+  @state()
+  private _loadingSubtext = "";
+
+  @state()
+  private _apiError: string | null = null;
+
+  @state()
+  private _hasLoadedLegalEntity = false;
+
+  public async connectedCallback(): Promise<void> {
+    super.connectedCallback();
+    await this._fetchLegalEntityDetails();
+  }
+
+  protected async updated(): Promise<void> {
+    if (!this._apiService && this.apiKey && this.apiSecret && this.baseUrl) {
+      this._apiService = new ApiService(
+        this.apiKey,
+        this.apiSecret,
+        this.baseUrl,
+        this.isMocked
+      );
+      this.requestUpdate("_apiService");
+    }
+    if (this._apiService && this.accountId && !this._hasLoadedLegalEntity) {
+      await this._fetchLegalEntityDetails();
+    }
+  }
+
+  private async _fetchLegalEntityDetails(): Promise<void> {
+    if (
+      this.apiKey &&
+      this.apiSecret &&
+      this.baseUrl &&
+      this.accountId &&
+      !this._hasLoadedLegalEntity
+    ) {
+      if (!this._apiService) {
+        this._apiService = new ApiService(
+          this.apiKey,
+          this.apiSecret,
+          this.baseUrl,
+          this.isMocked
+        );
+      }
+      this._isLoading = true;
+      this._loadingSubtext = "Loading application summary...";
+      this._apiError = null;
+      try {
+        const legalEntity =
+          await this._apiService.getLegalEntityDetailsByAccountId(
+            this.accountId
+          );
+        if (legalEntity) {
+          if (legalEntity.businessDetails) {
+            this._businessDetails = legalEntity.businessDetails;
+          }
+          if (legalEntity.businessActivity) {
+            this._businessActivity = legalEntity.businessActivity;
+          }
+          if (legalEntity.businessRepresentative) {
+            this._businessRepresentative = legalEntity.businessRepresentative;
+          }
+          if (legalEntity.businessOwners) {
+            this._businessOwners = Array.isArray(legalEntity.businessOwners)
+              ? legalEntity.businessOwners
+              : [];
+          }
+          this._hasLoadedLegalEntity = true;
+          this.requestUpdate();
+        }
+      } catch (err) {
+        this._apiError =
+          err instanceof Error
+            ? err.message
+            : "Failed to load application summary";
+        this.dispatchEvent(
+          new CustomEvent("step-load-error", {
+            bubbles: true,
+            composed: true,
+            detail: {
+              businessDetails: this._businessDetails,
+              businessActivity: this._businessActivity,
+            },
+          })
+        );
+      } finally {
+        this._isLoading = false;
+        this._loadingSubtext = "";
+        this.requestUpdate();
+      }
+    }
+  }
+
   async saveData(): Promise<void> {
     console.debug("Submitting application...");
-    this.dispatchEvent(
-      new CustomEvent("application-submitted", { bubbles: true, composed: true }),
-    );
+    this._isLoading = true;
+    this._loadingSubtext = "Submitting application...";
+    this.requestUpdate();
+
+    try {
+      await this._apiService.submitOnboardingApplication(this.accountId);
+      console.debug("Application submitted");
+      this.dispatchEvent(
+        new CustomEvent("application-submitted", {
+          bubbles: true,
+          composed: true,
+        })
+      );
+    } catch (error) {
+      console.debug("Failed to submit application");
+      this._isLoading = false;
+      this._loadingSubtext = "";
+      this.requestUpdate();
+      throw error;
+    } finally {
+      this._isLoading = false;
+      this._loadingSubtext = "";
+      this.requestUpdate();
+    }
   }
 
   private _renderSummarySection(
     title: string,
-    data: Record<string, any> | undefined,
+    data: Record<string, any> | undefined
   ) {
     if (!data) return nothing;
 
     const formatValue = (key: string, value: any) => {
       if (
-        (key === "registeredBusinessAddress" || key === "homeAddress")
-        && typeof value === "object"
-        && value
+        (key === "registeredBusinessAddress" || key === "homeAddress") &&
+        typeof value === "object" &&
+        value
       ) {
         return `${value.address}, ${value.city}, ${value.postalCode}, ${value.country}`;
       }
@@ -106,8 +227,9 @@ export class ApplicationSummary extends OnboardingStep {
       <div class="summary-section">
         <h4>${title}</h4>
         <div class="summary-grid">
-          ${Object.entries(data).map(([key, value]) => (value
-    ? html`
+          ${Object.entries(data).map(([key, value]) =>
+            value
+              ? html`
                   <div class="summary-item">
                     <span class="summary-key">${this._formatKey(key)}</span>
                     <span class="summary-value"
@@ -115,7 +237,8 @@ export class ApplicationSummary extends OnboardingStep {
                     >
                   </div>
                 `
-    : nothing))}
+              : nothing
+          )}
         </div>
       </div>
     `;
@@ -129,39 +252,52 @@ export class ApplicationSummary extends OnboardingStep {
 
   render() {
     return html`
-      <h3>Application Summary</h3>
-      <p>Please review your information before submitting.</p>
-
-      ${this._renderSummarySection(
-    "Business Information",
-    this._businessDetails,
-  )}
-      ${this._renderSummarySection("Business Activity", this._businessActivity)}
-      ${this._renderSummarySection(
-    "Business Representative",
-    this._businessRepresentative,
-  )}
-
-      <div class="summary-section">
-        <h4>Business Owners</h4>
-        ${
-  this._isRepresentativeOwner
-    ? html`<p>The Business Representative is also an owner.</p>`
-    : nothing
-}
-        <div class="summary-grid">
-          ${this._businessOwners?.map(
-    (owner) => html`
-              <div class="summary-item">
-                <span class="summary-key"
-                  >${owner.legalName.firstName} ${owner.legalName.lastName}</span
-                >
-                <span class="summary-value"
-                  >${owner.percentOwnership}% ownership</span
-                >
+      <div style="position: relative;">
+        ${this._isLoading
+          ? html`
+              <div class="loading-overlay">
+                <div class="loader"></div>
+                <div class="loader-subtext">${this._loadingSubtext}</div>
               </div>
-            `,
-  )}
+            `
+          : ""}
+
+        <h3>Application Summary</h3>
+        <p>Please review your information before submitting.</p>
+
+        ${this._renderSummarySection(
+          "Business Information",
+          this._businessDetails
+        )}
+        ${this._renderSummarySection(
+          "Business Activity",
+          this._businessActivity
+        )}
+        ${this._renderSummarySection(
+          "Business Representative",
+          this._businessRepresentative
+        )}
+
+        <div class="summary-section">
+          <h4>Business Owners</h4>
+          ${this._isRepresentativeOwner
+            ? html`<p>The Business Representative is also an owner.</p>`
+            : nothing}
+          <div class="summary-grid">
+            ${this._businessOwners?.map(
+              (owner) => html`
+                <div class="summary-item">
+                  <span class="summary-key"
+                    >${owner.legalName.firstName}
+                    ${owner.legalName.lastName}</span
+                  >
+                  <span class="summary-value"
+                    >${owner.percentOwnership}% ownership</span
+                  >
+                </div>
+              `
+            )}
+          </div>
         </div>
       </div>
     `;

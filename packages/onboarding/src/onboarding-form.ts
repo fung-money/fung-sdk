@@ -1,6 +1,4 @@
-import {
-  LitElement, html, css,
-} from "lit";
+import { LitElement, html, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { choose } from "lit/directives/choose.js";
 
@@ -147,6 +145,15 @@ export class OnboardingForm extends LitElement {
   @property({ type: String })
   public baseUrl = "http://localhost:3000/api/v2";
 
+  @property({ type: String })
+  public isMocked = false;
+
+  @property({ type: String })
+  public accountId = "";
+
+  @property({ type: String })
+  public userId = "";
+
   @state()
   private _currentStep = 0;
 
@@ -159,22 +166,23 @@ export class OnboardingForm extends LitElement {
 
   private async nextStep() {
     const currentStepTag = STEPS[this._currentStep];
-    const currentStepComponent = this.shadowRoot?.querySelector<OnboardingStep>(currentStepTag);
+    const currentStepComponent =
+      this.shadowRoot?.querySelector<OnboardingStep>(currentStepTag);
 
     if (currentStepComponent) {
       currentStepComponent.saveData();
     }
   }
 
-  private handleStepSaved(event: CustomEvent) {
+  private _handleStepSaved(event: CustomEvent) {
     console.debug("Event received", event);
     this._currentStep = Math.min(this._currentStep + 1, STEPS.length - 1);
     this.requestUpdate();
   }
 
-  private saveAndContinue() {
+  private _saveAndExit() {
     this.dispatchEvent(
-      new CustomEvent("save-and-exit", { bubbles: true, composed: true }),
+      new CustomEvent("save-and-exit", { bubbles: true, composed: true })
     );
   }
 
@@ -183,6 +191,11 @@ export class OnboardingForm extends LitElement {
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+  }
+
+  private _goToStep(index: number) {
+    this._currentStep = index;
+    this.requestUpdate();
   }
 
   render() {
@@ -194,72 +207,83 @@ export class OnboardingForm extends LitElement {
       <div class="onboarding-wrapper">
         <div class="stepper">
           ${STEPS.map(
-    (step, index) => html`
+            (step, index) => html`
               <div
                 class="step ${this._currentStep === index
-    ? "active"
-    : ""} ${this._currentStep > index ? "completed" : ""}"
+                  ? "active"
+                  : ""} ${this._currentStep > index ? "completed" : ""}"
+                @click=${() => this._goToStep(index)}
+                style=${"cursor: pointer"}
               >
                 <div class="step-number">${index + 1}</div>
                 <div class="step-title">${this._formatStepTitle(step)}</div>
               </div>
               ${index < STEPS.length - 1
-    ? html`<div class="step-connector"></div>`
-    : ""}
-            `,
-  )}
+                ? html`<div class="step-connector"></div>`
+                : ""}
+            `
+          )}
         </div>
-        <div class="flow-container" @step-saved=${this.handleStepSaved}>
+        <div class="flow-container" @step-saved=${this._handleStepSaved}>
           ${choose(
-    STEPS[this._currentStep],
-    [
-      [
-        "business-information",
-        () => html`<business-information
-                    .apiKey=${this.apiKey}
-                    .apiSecret=${this.apiSecret}
-                    .baseUrl=${this.baseUrl}
-                  ></business-information>`,
-      ],
-      [
-        "related-parties",
-        () => html`<related-parties
-                    .apiKey=${this.apiKey}
-                    .apiSecret=${this.apiSecret}
-                    .baseUrl=${this.baseUrl}
-                  ></related-parties>`,
-      ],
-      [
-        "upload-documents",
-        () => html`<upload-documents
-                    .apiKey=${this.apiKey}
-                    .apiSecret=${this.apiSecret}
-                    .baseUrl=${this.baseUrl}
-                  ></upload-documents>`,
-      ],
-      [
-        "identity-verification",
-        () => html`<identity-verification
-                    .apiKey=${this.apiKey}
-                    .apiSecret=${this.apiSecret}
-                    .baseUrl=${this.baseUrl}
-                  ></identity-verification>`,
-      ],
-      [
-        "application-summary",
-        () => html`<application-summary
-                    .apiKey=${this.apiKey}
-                    .apiSecret=${this.apiSecret}
-                    .baseUrl=${this.baseUrl}
-                  ></application-summary>`,
-      ],
-    ],
-    () => html`<p>Something went wrong.</p>`,
-  )}
+            STEPS[this._currentStep],
+            [
+              [
+                "business-information",
+                () => html`<business-information
+                  .apiKey=${this.apiKey}
+                  .apiSecret=${this.apiSecret}
+                  .baseUrl=${this.baseUrl}
+                  .accountId=${this.accountId}
+                  .isMocked=${this.isMocked}
+                  .userId=${this.userId}
+                ></business-information>`,
+              ],
+              [
+                "related-parties",
+                () => html`<related-parties
+                  .apiKey=${this.apiKey}
+                  .apiSecret=${this.apiSecret}
+                  .baseUrl=${this.baseUrl}
+                  .accountId=${this.accountId}
+                  .isMocked=${this.isMocked}
+                ></related-parties>`,
+              ],
+              [
+                "upload-documents",
+                () => html`<upload-documents
+                  .apiKey=${this.apiKey}
+                  .apiSecret=${this.apiSecret}
+                  .baseUrl=${this.baseUrl}
+                  .isMocked=${this.isMocked}
+                ></upload-documents>`,
+              ],
+              [
+                "identity-verification",
+                () => html`<identity-verification
+                  .apiKey=${this.apiKey}
+                  .apiSecret=${this.apiSecret}
+                  .baseUrl=${this.baseUrl}
+                  .isMocked=${this.isMocked}
+                ></identity-verification>`,
+              ],
+              [
+                "application-summary",
+                () => html`<application-summary
+                  .apiKey=${this.apiKey}
+                  .apiSecret=${this.apiSecret}
+                  .baseUrl=${this.baseUrl}
+                  .accountId=${this.accountId}
+                  .isMocked=${this.isMocked}
+                ></application-summary>`,
+              ],
+            ],
+            () => html`<p>Something went wrong.</p>`
+          )}
         </div>
 
         <div class="navigation">
-          <button class="nav-btn-secondary" @click=${this.saveAndContinue}>
+          <button class="nav-btn-secondary" @click=${this._saveAndExit}>
             Save & Exit
           </button>
           <div>
@@ -272,11 +296,11 @@ export class OnboardingForm extends LitElement {
             </button>
             <button
               @click=${this.nextStep}
-              .disabled=${this._currentStep === STEPS.length - 1}
+              .disabled=${this._currentStep === STEPS.length}
             >
               ${this._currentStep === STEPS.length - 1
-    ? "Submit"
-    : "Save & Continue"}
+                ? "Submit"
+                : "Save & Continue"}
             </button>
           </div>
         </div>

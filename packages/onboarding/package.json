@@ -13,7 +13,8 @@
     "build:esm": "tsc -p ./tsconfig.esm.json && mv ./dist/esm/index.js ./dist/esm/index.mjs && echo '{ \"type\": \"module\" }' > ./dist/esm/package.json",
     "build:cjs": "tsc -p ./tsconfig.json",
     "prepack": "npm run build:esm && npm run build:cjs",
-    "pre-commit": "npm run lint && npm run test && npm run build"
+    "pre-commit": "npm run lint && npm run test && npm run build",
+    "serve": "http-server . -o"
   },
   "exports": {
     ".": {

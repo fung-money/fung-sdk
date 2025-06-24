@@ -6,9 +6,9 @@
     <title>Onboarding Component Test</title>
     <style>
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-          'Segoe UI Symbol';
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+          "Segoe UI Symbol";
         padding: 2rem;
         background-color: #f7f7f7;
       }
@@ -24,7 +24,9 @@
   </head>
   <body>
     <h1>Onboarding Component Test Page</h1>
-    <a href="./style-test.html" style="display: block; margin-bottom: 1rem;">Switch to Style Tester Page</a>
+    <a href="./style-test.html" style="display: block; margin-bottom: 1rem"
+      >Switch to Style Tester Page</a
+    >
     <p>
       This page demonstrates the live usage of the
       <code>&lt;onboarding-flow&gt;</code> component.
@@ -36,9 +38,11 @@
       here corresponds to the `name` property in the Lit component.
      -->
     <onboarding-form
-      apiKey="DUMMY_API_KEY"
-      apiSecret="DUMMY_API_SECRET"
-      baseUrl="https://apisbx.fungpayments.com/api/v2"
+      apiKey="dummy"
+      apiSecret="dummy"
+      accountId="dummy"
+      userId="dummy"
+      baseUrl="http://localhost:8001/v2"
     ></onboarding-form>
   </body>
-</html> 
+</html>
