@@ -162,7 +162,7 @@ export default class Checkout extends EventEmitter2 {
     iframe.allow = "payment *; encrypted-media *";
     iframe.setAttribute(
       "sandbox",
-      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-forms",
+      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-forms allow-top-navigation allow-top-navigation-by-user-activation",
     );
     iframe.style.width = "100%";
 
