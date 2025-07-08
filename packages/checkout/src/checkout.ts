@@ -162,7 +162,7 @@ export default class Checkout extends EventEmitter2 {
     iframe.allow = "payment *; encrypted-media *";
     iframe.setAttribute(
       "sandbox",
-      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-forms",
+      "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-forms allow-top-navigation allow-top-navigation-by-user-activation",
     );
     iframe.style.width = "100%";
 
@@ -176,7 +176,12 @@ export default class Checkout extends EventEmitter2 {
     }
 
     import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
-      iFrameResize({ checkOrigin: false }, iframe);
+      iFrameResize({
+        checkOrigin: false,
+        scrolling: true,
+        heightCalculationMethod: "documentElementScroll",
+        interval: -32,
+      }, iframe);
     });
     return iframe;
   }
