@@ -176,12 +176,7 @@ export default class Checkout extends EventEmitter2 {
     }
 
     import("iframe-resizer").then(({ iframeResizer: iFrameResize }) => {
-      iFrameResize({
-        checkOrigin: false,
-        scrolling: true,
-        heightCalculationMethod: "documentElementScroll",
-        interval: -32,
-      }, iframe);
+      iFrameResize({ checkOrigin: false }, iframe);
     });
     return iframe;
   }
