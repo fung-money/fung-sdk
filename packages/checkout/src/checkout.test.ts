@@ -739,4 +739,100 @@ describe("@fung-sdk/checkout", () => {
     expect(iframe).not.toBeNull();
     expect(iframe?.style.height).toBe("0px");
   });
+
+  describe("paymentMethods + variant", () => {
+    it("should throw an error if wallets are provided as paymentMethods for HEADLESS variant", () => {
+      expect(() => {
+        const checkout = new Checkout({
+          checkoutId: "abc",
+          containerId: "xyz",
+          variant: "HEADLESS",
+          paymentMethods: ["APPLE_PAY"],
+        });
+
+        checkout.render();
+      }).toThrow("APPLE_PAY, GOOGLE_PAY are not supported for HEADLESS variant");
+    });
+
+    it("should throw an error if non wallets are provided as paymentMethods for EXPRESS variant", () => {
+      expect(() => {
+        const checkout = new Checkout({
+          checkoutId: "abc",
+          containerId: "xyz",
+          variant: "EXPRESS",
+          paymentMethods: ["CARD"],
+        });
+
+        checkout.render();
+      }).toThrow("Only APPLE_PAY, GOOGLE_PAY are supported for EXPRESS variant");
+    });
+
+    it("should throw an error if non of the supported payment methods are provided", () => {
+      expect(() => {
+        const checkout = new Checkout({
+          checkoutId: "abc",
+          containerId: "xyz",
+          paymentMethods: ["INVALID"] as any,
+        });
+
+        checkout.render();
+      }).toThrow("Only CARD, IDEAL, TWINT, VIPPS, SEPA, SEPA_DIRECT_DEBIT, OPEN_BANKING, APPLE_PAY, GOOGLE_PAY are supported");
+    });
+
+    it("should add paymentMethods to the wallets URL, when variant is EXPRESS", () => {
+      const checkout = new Checkout({
+        checkoutId: "abc",
+        containerId: "xyz",
+        paymentMethods: ["APPLE_PAY"],
+        variant: "EXPRESS",
+      });
+
+      checkout.render();
+
+      const iframe = document.querySelector("iframe");
+      expect(iframe).not.toBeNull();
+      expect(iframe?.src).toContain("?paymentMethods=APPLE_PAY");
+
+      const checkout2 = new Checkout({
+        checkoutId: "abc",
+        containerId: "xyz",
+        paymentMethods: ["APPLE_PAY", "GOOGLE_PAY"],
+        variant: "EXPRESS",
+      });
+
+      checkout2.render();
+
+      const iframe2 = document.querySelector("iframe");
+      expect(iframe2).not.toBeNull();
+      expect(iframe2?.src).toContain("?paymentMethods=APPLE_PAY%2CGOOGLE_PAY");
+    });
+
+    it("should add paymentMethods to the wallets URL, when variant is HEADLESS or STANDARD", () => {
+      const checkout = new Checkout({
+        checkoutId: "abc",
+        containerId: "xyz",
+        paymentMethods: ["CARD", "IDEAL"],
+        variant: "STANDARD",
+      });
+
+      checkout.render();
+
+      const iframe = document.querySelector("iframe");
+      expect(iframe).not.toBeNull();
+      expect(iframe?.src).toContain("variant=STANDARD&paymentMethods=CARD%2CIDEAL");
+
+      const checkout2 = new Checkout({
+        checkoutId: "abc",
+        containerId: "xyz",
+        paymentMethods: ["CARD", "IDEAL", "TWINT"],
+        variant: "HEADLESS",
+      });
+
+      checkout2.render();
+
+      const iframe2 = document.querySelector("iframe");
+      expect(iframe2).not.toBeNull();
+      expect(iframe2?.src).toContain("variant=HEADLESS&paymentMethods=CARD%2CIDEAL%2CTWINT");
+    });
+  });
 });
