@@ -819,7 +819,7 @@ describe("@fung-sdk/checkout", () => {
 
       const iframe = document.querySelector("iframe");
       expect(iframe).not.toBeNull();
-      expect(iframe?.src).toContain("variant=STANDARD&paymentMethods=CARD%2CIDEAL");
+      expect(iframe?.src).toContain("paymentMethods=CARD%2CIDEAL");
 
       const checkout2 = new Checkout({
         checkoutId: "abc",

@@ -185,8 +185,9 @@ export default class Checkout extends EventEmitter2 {
     if (this.darkMode) params.append("dark", "true");
     if (this.formOnly) params.append("formOnly", "true");
 
-    if (this.variant) {
+    if (this.variant === "HEADLESS") {
       params.append("variant", this.variant);
+      params.delete("formOnly");
     }
 
     if (this.paymentMethods.length > 0) {
