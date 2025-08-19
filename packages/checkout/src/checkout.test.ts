@@ -776,7 +776,7 @@ describe("@fung-sdk/checkout", () => {
         });
 
         checkout.render();
-      }).toThrow("Only CARD, IDEAL, TWINT, VIPPS, SEPA, SEPA_DIRECT_DEBIT, OPEN_BANKING, APPLE_PAY, GOOGLE_PAY are supported");
+      }).toThrow("Only CARD, IDEAL, TWINT, VIPPS, SEPA, SEPADD, OPENBANKING, APPLE_PAY, GOOGLE_PAY are supported");
     });
 
     it("should add paymentMethods to the wallets URL, when variant is EXPRESS", () => {

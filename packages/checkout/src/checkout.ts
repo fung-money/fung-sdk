@@ -10,7 +10,7 @@ import {
 
 export type Env = "production" | "sandbox" | "development" | "local";
 export type TVariant = "HEADLESS" | "EXPRESS" | "STANDARD";
-export type TPaymentMethod = "CARD" | "IDEAL" | "TWINT" | "VIPPS" | "APPLE_PAY" | "GOOGLE_PAY" | "SEPA" | "SEPA_DIRECT_DEBIT" | "OPEN_BANKING";
+export type TPaymentMethod = "CARD" | "IDEAL" | "TWINT" | "VIPPS" | "APPLE_PAY" | "GOOGLE_PAY" | "SEPA" | "SEPADD" | "OPENBANKING";
 
 const WALLETS: TPaymentMethod[] = ["APPLE_PAY", "GOOGLE_PAY"];
 const SUPPORTED_PAYMENT_METHODS: TPaymentMethod[] = [
@@ -19,8 +19,8 @@ const SUPPORTED_PAYMENT_METHODS: TPaymentMethod[] = [
   "TWINT",
   "VIPPS",
   "SEPA",
-  "SEPA_DIRECT_DEBIT",
-  "OPEN_BANKING",
+  "SEPADD",
+  "OPENBANKING",
   ...WALLETS,
 ];
 
