@@ -9,6 +9,20 @@ import {
 } from "./config.js";
 
 export type Env = "production" | "sandbox" | "development" | "local";
+export type TVariant = "HEADLESS" | "EXPRESS" | "STANDARD";
+export type TPaymentMethod = "CARD" | "IDEAL" | "TWINT" | "VIPPS" | "APPLE_PAY" | "GOOGLE_PAY" | "SEPA" | "SEPADD" | "OPENBANKING";
+
+const WALLETS: TPaymentMethod[] = ["APPLE_PAY", "GOOGLE_PAY"];
+const SUPPORTED_PAYMENT_METHODS: TPaymentMethod[] = [
+  "CARD",
+  "IDEAL",
+  "TWINT",
+  "VIPPS",
+  "SEPA",
+  "SEPADD",
+  "OPENBANKING",
+  ...WALLETS,
+];
 
 interface ITheme {
   accentColor: string;
@@ -46,6 +60,10 @@ export default class Checkout extends EventEmitter2 {
 
   protected windowProxy: WindowProxy | null = null;
 
+  protected variant: TVariant = "STANDARD";
+
+  protected paymentMethods: TPaymentMethod[] = [];
+
   paymentMethod: string | undefined;
 
   protected style = {
@@ -61,10 +79,18 @@ export default class Checkout extends EventEmitter2 {
     url = null,
     small = false,
     height,
+    /**
+     * @deprecated Use variant = 'HEADLESS' instead
+     */
     formOnly = false,
+    /**
+     * @deprecated Use variant = 'EXPRESS' instead
+     */
     walletsOnly = false,
+    variant,
     language = "en",
     darkMode = false,
+    paymentMethods,
   }: {
     checkoutId: string;
     container?: HTMLElement;
@@ -73,10 +99,18 @@ export default class Checkout extends EventEmitter2 {
     url?: string | null;
     small?: boolean;
     height?: string;
+    /**
+     * @deprecated Use variant = 'HEADLESS' instead
+     */
     formOnly?: boolean;
+    /**
+     * @deprecated Use variant = 'EXPRESS' instead
+     */
     walletsOnly?: boolean;
     language?: string;
+    variant?: TVariant;
     darkMode?: boolean;
+    paymentMethods?: TPaymentMethod[];
   }) {
     super();
 
@@ -98,7 +132,42 @@ export default class Checkout extends EventEmitter2 {
     this.language = language;
     this.darkMode = darkMode;
 
-    if (this.walletsOnly) this.small = true;
+    if (variant) {
+      this.variant = variant;
+    }
+
+    if (paymentMethods && paymentMethods.length > 0) {
+      this.validatePaymentMethods(paymentMethods);
+      this.paymentMethods = paymentMethods;
+    }
+
+    if (this.walletsOnly) {
+      this.small = true;
+    }
+  }
+
+  private validatePaymentMethods(paymentMethods: TPaymentMethod[]): void {
+    if (this.variant === "EXPRESS") {
+      // Express only supports wallets
+      if (paymentMethods.some((paymentMethod) => !WALLETS.includes(paymentMethod))) {
+        throw new Error(`Only ${WALLETS.join(", ")} are supported for ${this.variant} variant`);
+      }
+    }
+
+    if (this.variant === "HEADLESS") {
+      // Headless can not have any wallets
+      if (paymentMethods.some((paymentMethod) => WALLETS.includes(paymentMethod))) {
+        throw new Error(`${WALLETS.join(", ")} are not supported for ${this.variant} variant`);
+      }
+    }
+
+    // Throw error if non of the supported payment methods are provided
+    if (!paymentMethods
+      .some((paymentMethod) => SUPPORTED_PAYMENT_METHODS.includes(paymentMethod))) {
+      throw new Error(`Only ${SUPPORTED_PAYMENT_METHODS.join(", ")} are supported`);
+    }
+
+    // Standard can have all
   }
 
   private getQueryParameters(): string {
@@ -115,6 +184,15 @@ export default class Checkout extends EventEmitter2 {
 
     if (this.darkMode) params.append("dark", "true");
     if (this.formOnly) params.append("formOnly", "true");
+
+    if (this.variant === "HEADLESS") {
+      params.append("variant", this.variant);
+      params.delete("formOnly");
+    }
+
+    if (this.paymentMethods.length > 0) {
+      params.append("paymentMethods", this.paymentMethods.join(","));
+    }
 
     return `?${params.toString()}`;
   }
@@ -144,7 +222,29 @@ export default class Checkout extends EventEmitter2 {
   private getCheckoutUrl() {
     const baseUrl = this.getBaseUrl();
 
-    if (this.walletsOnly) return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+    if (this.walletsOnly || this.variant === "EXPRESS") {
+      const params = new URLSearchParams();
+      const selectedWallets: TPaymentMethod[] = [];
+
+      if (this.paymentMethods.length > 0) {
+        this.paymentMethods.forEach((paymentMethod) => {
+          if (WALLETS.includes(paymentMethod)) {
+            selectedWallets.push(paymentMethod);
+          }
+        });
+
+        if (selectedWallets.length > 0) {
+          params.append("paymentMethods", selectedWallets as any as string);
+        }
+
+        if (params.toString() !== "") {
+          return `${baseUrl}/checkout/${this.checkoutId}/wallets?${params.toString()}`;
+        }
+      }
+
+      return `${baseUrl}/checkout/${this.checkoutId}/wallets`;
+    }
+
     if (this.url) return `${this.url}${this.getQueryParameters()}`;
 
     return `${baseUrl}/checkout/${
