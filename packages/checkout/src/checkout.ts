@@ -312,6 +312,7 @@ export default class Checkout extends EventEmitter2 {
       || Object.values(CheckoutEvent).includes(event.data.type)
     ) {
       if (event.data === CheckoutEvent.ResizeFull && !this.formOnly) {
+        // Only resize if the event is coming from its own iframe
         const isSourceEvent = event.source === (document.querySelector(`#${this.containerId || ""} iframe`) as HTMLIFrameElement)?.contentWindow;
         if (isSourceEvent) {
           this.resize(CheckoutEvent.ResizeFull);
