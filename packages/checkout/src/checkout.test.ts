@@ -834,5 +834,68 @@ describe("@fung-sdk/checkout", () => {
       expect(iframe2).not.toBeNull();
       expect(iframe2?.src).toContain("variant=HEADLESS&paymentMethods=CARD%2CIDEAL%2CTWINT");
     });
+
+    it("should set the position to fixed when walletsOnly is true, or variant is EXPRESS", async () => {
+      const checkout = new Checkout({
+        checkoutId: "abc",
+        containerId: "xyz",
+        walletsOnly: true,
+      });
+
+      checkout.render();
+
+      const iframe = document.querySelector("iframe");
+      window.dispatchEvent(new window.MessageEvent("message", {
+        data: CheckoutEvent.ResizeFull,
+        source: iframe?.contentWindow,
+        origin: window.origin,
+      }));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+      expect(iframe).not.toBeNull();
+      expect(iframe?.style.position).toBe("fixed");
+
+      const checkout2 = new Checkout({
+        checkoutId: "abc",
+        containerId: "xyz",
+        variant: "EXPRESS",
+      });
+
+      checkout2.render();
+
+      const iframe2 = document.querySelector("iframe");
+      window.dispatchEvent(new window.MessageEvent("message", {
+        data: CheckoutEvent.ResizeFull,
+        source: iframe2?.contentWindow,
+        origin: window.origin,
+      }));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+      expect(iframe2).not.toBeNull();
+      expect(iframe2?.style.position).toBe("fixed");
+
+      // If none of the conditions above are met, the position should be absolute
+      const checkout3 = new Checkout({
+        checkoutId: "abc",
+        containerId: "xyz",
+        variant: "HEADLESS",
+      });
+
+      checkout3.render();
+
+      const iframe3 = document.querySelector("iframe");
+      window.dispatchEvent(new window.MessageEvent("message", {
+        data: CheckoutEvent.ResizeFull,
+        source: iframe3?.contentWindow,
+        origin: window.origin,
+      }));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+      expect(iframe3).not.toBeNull();
+      expect(iframe3?.style.position).toBe("absolute");
+    });
   });
 });

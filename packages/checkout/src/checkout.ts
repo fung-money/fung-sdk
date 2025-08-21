@@ -10,7 +10,16 @@ import {
 
 export type Env = "production" | "sandbox" | "development" | "local";
 export type TVariant = "HEADLESS" | "EXPRESS" | "STANDARD";
-export type TPaymentMethod = "CARD" | "IDEAL" | "TWINT" | "VIPPS" | "APPLE_PAY" | "GOOGLE_PAY" | "SEPA" | "SEPADD" | "OPENBANKING";
+export type TPaymentMethod =
+  | "CARD"
+  | "IDEAL"
+  | "TWINT"
+  | "VIPPS"
+  | "APPLE_PAY"
+  | "GOOGLE_PAY"
+  | "SEPA"
+  | "SEPADD"
+  | "OPENBANKING";
 
 const WALLETS: TPaymentMethod[] = ["APPLE_PAY", "GOOGLE_PAY"];
 const SUPPORTED_PAYMENT_METHODS: TPaymentMethod[] = [
@@ -39,6 +48,8 @@ export default class Checkout extends EventEmitter2 {
   protected checkoutId: string;
 
   protected container: HTMLElement | null = null;
+
+  protected containerId: string | null = null;
 
   protected env: Env;
 
@@ -123,6 +134,7 @@ export default class Checkout extends EventEmitter2 {
 
     this.checkoutId = checkoutId;
     this.container = container || document.getElementById(containerId || "");
+    this.containerId = containerId || null;
     this.env = env;
     this.url = url;
     this.small = small;
@@ -149,22 +161,33 @@ export default class Checkout extends EventEmitter2 {
   private validatePaymentMethods(paymentMethods: TPaymentMethod[]): void {
     if (this.variant === "EXPRESS") {
       // Express only supports wallets
-      if (paymentMethods.some((paymentMethod) => !WALLETS.includes(paymentMethod))) {
-        throw new Error(`Only ${WALLETS.join(", ")} are supported for ${this.variant} variant`);
+      if (
+        paymentMethods.some((paymentMethod) => !WALLETS.includes(paymentMethod))
+      ) {
+        throw new Error(
+          `Only ${WALLETS.join(", ")} are supported for ${this.variant} variant`,
+        );
       }
     }
 
     if (this.variant === "HEADLESS") {
       // Headless can not have any wallets
-      if (paymentMethods.some((paymentMethod) => WALLETS.includes(paymentMethod))) {
-        throw new Error(`${WALLETS.join(", ")} are not supported for ${this.variant} variant`);
+      if (
+        paymentMethods.some((paymentMethod) => WALLETS.includes(paymentMethod))
+      ) {
+        throw new Error(
+          `${WALLETS.join(", ")} are not supported for ${this.variant} variant`,
+        );
       }
     }
 
     // Throw error if non of the supported payment methods are provided
-    if (!paymentMethods
-      .some((paymentMethod) => SUPPORTED_PAYMENT_METHODS.includes(paymentMethod))) {
-      throw new Error(`Only ${SUPPORTED_PAYMENT_METHODS.join(", ")} are supported`);
+    if (
+      !paymentMethods.some((paymentMethod) => SUPPORTED_PAYMENT_METHODS.includes(paymentMethod))
+    ) {
+      throw new Error(
+        `Only ${SUPPORTED_PAYMENT_METHODS.join(", ")} are supported`,
+      );
     }
 
     // Standard can have all
@@ -238,7 +261,9 @@ export default class Checkout extends EventEmitter2 {
         }
 
         if (params.toString() !== "") {
-          return `${baseUrl}/checkout/${this.checkoutId}/wallets?${params.toString()}`;
+          return `${baseUrl}/checkout/${
+            this.checkoutId
+          }/wallets?${params.toString()}`;
         }
       }
 
@@ -287,7 +312,11 @@ export default class Checkout extends EventEmitter2 {
       || Object.values(CheckoutEvent).includes(event.data.type)
     ) {
       if (event.data === CheckoutEvent.ResizeFull && !this.formOnly) {
-        this.resize(CheckoutEvent.ResizeFull);
+        // Only resize if the event is coming from its own iframe
+        const isSourceEvent = event.source === (document.querySelector(`#${this.containerId || ""} iframe`) as HTMLIFrameElement)?.contentWindow;
+        if (isSourceEvent) {
+          this.resize(CheckoutEvent.ResizeFull);
+        }
       } else if (event.data === CheckoutEvent.ResizeReset && !this.formOnly) {
         this.resize(CheckoutEvent.ResizeReset);
       } else if (event.data.type === CheckoutEvent.ResizeIframeHeight) {
@@ -333,7 +362,7 @@ export default class Checkout extends EventEmitter2 {
       this.iframe.style.minWidth = "0px";
       this.iframe.style.minHeight = "0px";
       this.iframe.style.border = "none";
-      this.iframe.style.position = "absolute";
+      this.iframe.style.position = this.walletsOnly || this.variant === "EXPRESS" ? "fixed" : "absolute";
       this.iframe.style.top = "0";
       this.iframe.style.left = "0";
       this.iframe.style.zIndex = "9999";
