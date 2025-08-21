@@ -845,7 +845,11 @@ describe("@fung-sdk/checkout", () => {
       checkout.render();
 
       const iframe = document.querySelector("iframe");
-      iframe?.contentWindow?.parent.postMessage(CheckoutEvent.ResizeFull, "*");
+      window.dispatchEvent(new window.MessageEvent("message", {
+        data: CheckoutEvent.ResizeFull,
+        source: iframe?.contentWindow,
+        origin: window.origin,
+      }));
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
       });
@@ -861,7 +865,11 @@ describe("@fung-sdk/checkout", () => {
       checkout2.render();
 
       const iframe2 = document.querySelector("iframe");
-      iframe2?.contentWindow?.parent.postMessage(CheckoutEvent.ResizeFull, "*");
+      window.dispatchEvent(new window.MessageEvent("message", {
+        data: CheckoutEvent.ResizeFull,
+        source: iframe2?.contentWindow,
+        origin: window.origin,
+      }));
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
       });
@@ -878,7 +886,11 @@ describe("@fung-sdk/checkout", () => {
       checkout3.render();
 
       const iframe3 = document.querySelector("iframe");
-      iframe3?.contentWindow?.parent.postMessage(CheckoutEvent.ResizeFull, "*");
+      window.dispatchEvent(new window.MessageEvent("message", {
+        data: CheckoutEvent.ResizeFull,
+        source: iframe3?.contentWindow,
+        origin: window.origin,
+      }));
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
       });

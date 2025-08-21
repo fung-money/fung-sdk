@@ -49,6 +49,8 @@ export default class Checkout extends EventEmitter2 {
 
   protected container: HTMLElement | null = null;
 
+  protected containerId: string | null = null;
+
   protected env: Env;
 
   protected url: string | null;
@@ -132,6 +134,7 @@ export default class Checkout extends EventEmitter2 {
 
     this.checkoutId = checkoutId;
     this.container = container || document.getElementById(containerId || "");
+    this.containerId = containerId || null;
     this.env = env;
     this.url = url;
     this.small = small;
@@ -309,7 +312,10 @@ export default class Checkout extends EventEmitter2 {
       || Object.values(CheckoutEvent).includes(event.data.type)
     ) {
       if (event.data === CheckoutEvent.ResizeFull && !this.formOnly) {
-        this.resize(CheckoutEvent.ResizeFull);
+        const isSourceEvent = event.source === (document.querySelector(`#${this.containerId || ""} iframe`) as HTMLIFrameElement)?.contentWindow;
+        if (isSourceEvent) {
+          this.resize(CheckoutEvent.ResizeFull);
+        }
       } else if (event.data === CheckoutEvent.ResizeReset && !this.formOnly) {
         this.resize(CheckoutEvent.ResizeReset);
       } else if (event.data.type === CheckoutEvent.ResizeIframeHeight) {
