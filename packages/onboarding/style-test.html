@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding Component Style Tester</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+          "Segoe UI Symbol";
+        padding: 2rem;
+        background-color: #f7f7f7;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+      }
+      .controls {
+        padding: 1.5rem;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        height: fit-content;
+      }
+      .control-group {
+        margin-bottom: 1.25rem;
+      }
+      .control-group:last-child {
+        margin-bottom: 0;
+      }
+      label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+        font-size: 0.9rem;
+      }
+      label span:last-child {
+        font-family: monospace;
+        background-color: #eee;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+      }
+      input[type="color"] {
+        width: 100%;
+        height: 40px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      input[type="range"] {
+        width: 100%;
+      }
+      h1,
+      p {
+        grid-column: 1 / -1;
+      }
+    </style>
+    <!-- Import the component -->
+    <script type="module" src="./dist/index.js"></script>
+  </head>
+  <body>
+    <h1>Onboarding Component Style Tester</h1>
+    <a href="./index.html" style="grid-column: 1 / -1"
+      >Switch to Component Test Page</a
+    >
+    <p>Use the controls to dynamically change the component's appearance.</p>
+
+    <div class="controls">
+      <h2>Style Controls</h2>
+      <div class="control-group">
+        <label for="primaryColor"
+          ><span>Primary Color</span> <span id="primaryColorValue"></span
+        ></label>
+        <input
+          type="color"
+          id="primaryColor"
+          data-css-var="--primary-color"
+          value="#007aff"
+        />
+      </div>
+      <div class="control-group">
+        <label for="secondaryColor"
+          ><span>Secondary Color</span> <span id="secondaryColorValue"></span
+        ></label>
+        <input
+          type="color"
+          id="secondaryColor"
+          data-css-var="--secondary-color"
+          value="#6c757d"
+        />
+      </div>
+      <div class="control-group">
+        <label for="borderColor"
+          ><span>Border Color</span> <span id="borderColorValue"></span
+        ></label>
+        <input
+          type="color"
+          id="borderColor"
+          data-css-var="--border-color"
+          value="#ced4da"
+        />
+      </div>
+      <div class="control-group">
+        <label for="backgroundColor"
+          ><span>Background Color</span> <span id="backgroundColorValue"></span
+        ></label>
+        <input
+          type="color"
+          id="backgroundColor"
+          data-css-var="--background-color"
+          value="#f8f9fa"
+        />
+      </div>
+      <div class="control-group">
+        <label for="inputBackground"
+          ><span>Input Background</span> <span id="inputBackgroundValue"></span
+        ></label>
+        <input
+          type="color"
+          id="inputBackground"
+          data-css-var="--input-background"
+          value="#ffffff"
+        />
+      </div>
+      <div class="control-group">
+        <label for="formPadding"
+          ><span>Container Padding</span> <span id="formPaddingValue"></span
+        ></label>
+        <input
+          type="range"
+          id="formPadding"
+          data-css-var="--form-section-padding"
+          min="0"
+          max="48"
+          value="24"
+          data-unit="px"
+        />
+      </div>
+      <div class="control-group">
+        <label for="borderRadius"
+          ><span>Border Radius</span> <span id="borderRadiusValue"></span
+        ></label>
+        <input
+          type="range"
+          id="borderRadius"
+          data-css-var="--form-section-border-radius"
+          min="0"
+          max="32"
+          value="8"
+          data-unit="px"
+        />
+      </div>
+    </div>
+
+    <div>
+      <onboarding-form
+        id="onboardingComponent"
+        apiKey="31210151000010092a97dfeb011"
+        apiSecret="6286ccd3-edc8-4014-a690-02c3f83e9d09"
+        accountId="3121002100007003f3cd449f095"
+        userId="3121014100001009253b6d5b010"
+        baseUrl="http://localhost:8001/v2"
+      ></onboarding-form>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const component = document.getElementById("onboardingComponent");
+        const controls = document.querySelectorAll(".controls [data-css-var]");
+
+        function updateStyle(control) {
+          const cssVar = control.dataset.cssVar;
+          const unit = control.dataset.unit || "";
+          const value = control.value + unit;
+          const valueLabel = document.getElementById(control.id + "Value");
+
+          component.style.setProperty(cssVar, value);
+
+          if (valueLabel) {
+            valueLabel.textContent = value;
+          }
+        }
+
+        controls.forEach((control) => {
+          // Set initial values
+          updateStyle(control);
+
+          // Add event listener
+          control.addEventListener("input", () => updateStyle(control));
+        });
+      });
+    </script>
+  </body>
+</html>
